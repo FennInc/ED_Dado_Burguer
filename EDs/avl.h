@@ -39,6 +39,6 @@ NodoAvl* avlDestruir(NodoAvl *raiz);
 
 int avlContarNos(const NodoAvl *raiz);
 
-void avlGravarMedicoes(const NodoAvl *raiz);
+void avlGravarMedicoes(const NodoAvl *raiz, const double tempo);
 
 #endif

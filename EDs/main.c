@@ -5,7 +5,7 @@
 
 //negocio de manipular arquivos fiz com IA mesmo.
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
+    if (argc < 3) {
         fprintf(stderr, "Uso: %s <pedidos> <historico>\n", argv[0]);
         return 1;
     }
@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 
     Pedido val;
 
-    while (fscanf(fp, "%d %7s", &val.cod, val.receita) == 2) {
+    while (fscanf(fp, "%d %8s", &val.cod, val.receita) == 2) {
         raiz = avlInserir(raiz, val); // insere os baguiu nos trem né
     }
 
@@ -37,9 +37,9 @@ int main(int argc, char *argv[]) {
     fclose(fp);
 
     //gravando 
-    avlGravarMedicoes(raiz);
+    avlGravarMedicoes(raiz, tempo);
 
-    printf("Tempo de carregamento: %.6f s\n", tempo);
+    printf("Tempo de carregamento: %.2f s\n", tempo);
 
     if (fh != NULL) fclose(fh);
     
