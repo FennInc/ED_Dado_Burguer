@@ -20,6 +20,9 @@ struct str_NodoAvl {
 
 //DESGRAÇA DE CONTRATOS
 extern int g_rotacoes;
+extern int g_buscas;
+extern int g_comparacoes;
+extern double g_tempo_buscas;
 
 int avlAltura(const NodoAvl *no);
 int avlFb(const NodoAvl *no);
@@ -40,5 +43,7 @@ NodoAvl* avlDestruir(NodoAvl *raiz);
 int avlContarNos(const NodoAvl *raiz);
 
 void avlGravarMedicoes(const NodoAvl *raiz, const double tempo);
+
+void emOrdem(const NodoAvl *raiz);
 
 #endif

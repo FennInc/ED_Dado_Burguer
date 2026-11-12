@@ -3,6 +3,9 @@
 #include <stdlib.h>
 
 int g_rotacoes = 0; // trem global de rotações
+int g_comparacoes = 0; // trem global de comparações
+int g_buscas = 0; //global de buscas
+double g_tempo_buscas = 0.0; //global de tempo de buscas
 
 /* Retorna -1 para NULL (convenção: folha=0, NULL=-1).
    Necessário para que 1 + max(h_esq, h_dir) funcione corretamente. */
@@ -83,10 +86,12 @@ NodoAvl* avlReequilibrar(NodoAvl *raiz) {
 }
 
 /* Busca: idêntica à Abp — a altura garantida torna-a O(log n). */
+//incrementa a cada comparação
 NodoAvl* avlBuscar(NodoAvl *raiz, int cod) {
     if (raiz == NULL)           return NULL;
-    if (cod == raiz->dado.cod) return raiz;
-    if (cod < raiz->dado.cod)  return avlBuscar(raiz->esq, cod);
+    if (cod == raiz->dado.cod){ g_comparacoes++; return raiz; }
+    if (cod < raiz->dado.cod){ g_comparacoes++; return avlBuscar(raiz->esq, cod); }
+    g_comparacoes++;
     return avlBuscar(raiz->dir, cod);
 }
 
@@ -169,7 +174,15 @@ void avlGravarMedicoes(const NodoAvl *raiz, const double tempo) {
     int alturaArv = avlAltura(raiz);
 
     // Grava as informações 
-    fprintf(arquivo, "Nos: %d | Altura: %d | Rotacoes: %d | Tempo:%.2fs\n", totalNos, alturaArv, g_rotacoes, tempo);
+    fprintf(arquivo, "Nos: %d | Altura: %d | Rotacoes: %d | Tempo:%.2fs\n | Buscas: %d | Comparacoes: %d | Tempo de busca: %.2fs\n", totalNos, alturaArv+1, g_rotacoes, tempo, g_buscas, g_comparacoes, g_tempo_buscas);
 
     fclose(arquivo);
+}
+
+void emOrdem(const NodoAvl *raiz) {   // também chamado: central
+    if (raiz == NULL) return;
+
+    emOrdem(raiz->esq);               // 1. primeiro a esquerda
+    printf("%d ", raiz->dado.cod);   // 2. visita a RAIZ (no meio)
+    emOrdem(raiz->dir);               // 3. depois a direita
 }

@@ -23,18 +23,41 @@ int main(int argc, char *argv[]) {
 
     // Zera o contador global pra poder reutilizar o programa omagah wow
     g_rotacoes = 0;
+    g_tempo_buscas = 0.0;
+    g_buscas = 0;
+    g_comparacoes = 0;
+
 
     Timer t;
     timer_iniciar(&t);
 
     Pedido val;
 
-    while (fscanf(fp, "%d %8s", &val.cod, val.receita) == 2) {
+    while (fscanf(fp, "%d %7s", &val.cod, val.receita) == 2) {
         raiz = avlInserir(raiz, val); // insere os baguiu nos trem né
     }
 
     double tempo = timer_parar(&t);
     fclose(fp);
+
+    Timer tb;
+    int cod;
+    printf("Digite um codigo para buscar (-1 para sair): ");
+    while (scanf("%d", &cod) == 1 && cod != -1) {
+        timer_iniciar(&tb);
+        NodoAvl *r = avlBuscar(raiz, cod);
+        g_tempo_buscas += timer_parar(&tb);
+        g_buscas++;
+
+        if (r != NULL) printf("Receita: %s\n", r->dado.receita);
+        else           printf("Codigo %d nao encontrado.\n", cod);
+
+        printf("Digite um codigo para buscar (-1 para sair): ");
+    }
+
+    printf("Buscas: %d\n", g_buscas);
+    printf("Comparacoes: %d\n", g_comparacoes);
+    printf("Tempo acumulado: %.6f s\n", g_tempo_buscas);
 
     //gravando 
     avlGravarMedicoes(raiz, tempo);
