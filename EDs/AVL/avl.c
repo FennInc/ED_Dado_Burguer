@@ -163,22 +163,6 @@ int avlContarNos(const NodoAvl *raiz) {
     return 1 + avlContarNos(raiz->esq) + avlContarNos(raiz->dir);
 }
 
-void avlGravarMedicoes(const NodoAvl *raiz, const double tempo) {
-    FILE *arquivo = fopen("medicoes.log", "a"); //adiciona no fim ao inves de sobreescrever, n sei qual dos dois deveria ser tho
-    if (arquivo == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
-        return;
-    }
-
-    int totalNos = avlContarNos(raiz);
-    int alturaArv = avlAltura(raiz);
-
-    // Grava as informações 
-    fprintf(arquivo, "Nos: %d | Altura: %d | Rotacoes: %d | Tempo:%.2fs\n | Buscas: %d | Comparacoes: %d | Tempo de busca: %.2fs\n", totalNos, alturaArv+1, g_rotacoes, tempo, g_buscas, g_comparacoes, g_tempo_buscas);
-
-    fclose(arquivo);
-}
-
 void emOrdem(const NodoAvl *raiz) {   // também chamado: central
     if (raiz == NULL) return;
 
