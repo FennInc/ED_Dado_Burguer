@@ -5,7 +5,7 @@
 #include "timer.h"
 #include "avl.h"
 #include "relatorio.h"
-/* TODO: #include "hash.h" quando o fluxo de cache for ligado */
+#include "hash.h"
 
 #define ARQUIVO_LOG "medicoes.log"
 
@@ -45,12 +45,17 @@ int main(int argc, char *argv[]) {
     relatorioParametros(semente, numClientes);
 
     NodoAvl *raiz = NULL; /* arvore de pedidos */
+    TabelaEnc *tabelaCache = malloc(sizeof(TabelaEnc));
+    encInicializar(tabelaCache, CFG_HASH_M);
 
     /* Zera os contadores globais antes de cada execucao. */
     g_rotacoes = 0;
     g_tempo_buscas = 0.0;
     g_buscas = 0;
     g_comparacoes = 0;
+    g_hits = 0;
+    g_miss = 0;
+    g_colisoes = 0;
     /* TODO: zerar tambem os contadores da hash (hits, misses, colisoes) */
 
     /* Carregamento dos pedidos na AVL, cronometrado. */
@@ -66,39 +71,48 @@ int main(int argc, char *argv[]) {
     fclose(fp);
 
     relatorioCarregamentoAvl(raiz, tempo);
-    /* TODO: relatorioHistoricoCarregado(entradas) quando o Bloco I entregar
-       a quantidade de entradas lidas do historico. */
 
-    /* Modo de teste: busca manual de codigos pelo teclado.
-       TODO: no jogo, o codigo vem do sorteio e a hash e consultada antes
-       da AVL (hit: devolve a receita; miss: busca na AVL e insere na hash). */
     Timer tb;
     int cod;
     printf("Digite um codigo para buscar (-1 para sair): ");
     while (scanf("%d", &cod) == 1 && cod != -1) {
         timer_iniciar(&tb);
+        NoHash *n = encBuscar(tabelaCache, cod);
+        if(n != NULL) {
+            g_hits++;
+            printf("Receita: %s\n", n->receita);
+        } else {
         NodoAvl *r = avlBuscar(raiz, cod);
         g_tempo_buscas += timer_parar(&tb);
         g_buscas++;
+        g_miss++;
 
-        if (r != NULL) printf("Receita: %s\n", r->dado.receita);
-        else           printf("Codigo %d nao encontrado.\n", cod);
-
+        if (r != NULL) { 
+            printf("Receita: %s\n", r->dado.receita);
+            encInserir(tabelaCache, r->dado.cod, r->dado.receita);
+        }
+        else printf("Codigo %d nao encontrado.\n", cod);
+        }
         printf("Digite um codigo para buscar (-1 para sair): ");
     }
 
     /* Relatorio de desempenho ao encerrar. */
-    double mediaComparacoes = 0.0; /* TODO: calcular (0 se nao houve busca) */
-
+    double mediaComparacoes = (g_buscas == 0) ? 0.0 : (double)g_comparacoes/g_buscas;
+    double taxa = (g_hits + g_miss == 0) ? 0.0 : (double)g_hits/(g_hits+g_miss) * 100;
+    double lambda = (double)tabelaCache->n/tabelaCache->m;
+    
     relatorioTitulo();
+    relatorioHash(tabelaCache->m, tabelaCache->n, lambda, g_hits, g_miss, taxa, g_colisoes);
     relatorioBuscasAvl(g_buscas, g_comparacoes, mediaComparacoes, g_tempo_buscas);
-    /* TODO: relatorioHash(m, n, lambda, hits, misses, taxa, colisoes) */
     relatorioFim();
 
     if (fh != NULL) fclose(fh);
 
     /* Libera a memoria da arvore. */
     raiz = avlDestruir(raiz);
+
+    encDestruir(tabelaCache);
+    free(tabelaCache);
 
     return 0;
 }

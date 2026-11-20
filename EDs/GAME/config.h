@@ -26,7 +26,7 @@
 #define CFG_VALIDADE_BACON 3
 
 /* ---------- Tabela hash (cache de pedidos) ---------- */
-#define CFG_HASH_M 13       /* tamanho da tabela. PROVISORIO */
+#define CFG_HASH_M 53       /* tamanho da tabela. PROVISORIO */
 
 /* ---------- Historico ---------- */
 #define CFG_TAM_NOME 20      /* maximo de caracteres do nome (sem o '\0') */

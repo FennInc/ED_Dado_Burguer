@@ -9,6 +9,10 @@
 #ifndef HASH_H
 #define HASH_H
 
+extern int g_hits;
+extern int g_miss;
+extern long g_colisoes;
+
 /* ================================================================
  * Funcoes de hash (aula 19)
  * ================================================================ */
@@ -34,21 +38,21 @@ int hashString(const char *s, int m);
  * Custo medio de busca: O(1 + lambda).
  */
 
-typedef struct No {
+typedef struct NoHash {
     int chave;
-    int valor;
-    struct No *prox;
-} No;
+    char receita[8];
+    struct NoHash *prox;
+} NoHash;
 
 typedef struct {
-    No **tabela;   /* vetor de ponteiros para listas */
+    NoHash **tabela;   /* vetor de ponteiros para listas */
     int m;         /* numero de slots */
     int n;         /* numero de elementos */
 } TabelaEnc;
 
 void encInicializar(TabelaEnc *t, int m);
-void encInserir(TabelaEnc *t, int chave, int valor);
-int  encBuscar(const TabelaEnc *t, int chave);
+void encInserir(TabelaEnc *t, int chave, char *receita);
+NoHash*  encBuscar(const TabelaEnc *t, int chave);
 int  encRemover(TabelaEnc *t, int chave);
 void encDestruir(TabelaEnc *t);
 
@@ -66,72 +70,5 @@ typedef struct {
     int valor;
     EstadoSlot estado;
 } Slot;
-
-
-/* ================================================================
- * Sondagem linear (aula 20)
- * ================================================================
- * pos(i) = (h(k) + i) mod m,  i = 0, 1, 2, ...
- * Vantagem: boa localidade de cache.
- * Desvantagem: agrupamento primario (clusters longos).
- * Requer lambda < 1; m primo recomendado.
- */
-
-typedef struct {
-    Slot *tabela;
-    int m;   /* numero de slots (primo recomendado) */
-    int n;   /* numero de elementos */
-} TabelaLinear;
-
-void linInicializar(TabelaLinear *t, int m);
-int  linInserir(TabelaLinear *t, int chave, int valor);
-int  linBuscar(const TabelaLinear *t, int chave);
-int  linRemover(TabelaLinear *t, int chave);
-void linDestruir(TabelaLinear *t);
-
-
-/* ================================================================
- * Sondagem quadratica (aula 20)
- * ================================================================
- * pos(i) = (h(k) + i^2) mod m,  i = 0, 1, 2, ...
- * Elimina agrupamento primario; pode nao visitar todos os slots
- * (garantido visitar pelo menos m/2 slots distintos se m e primo).
- * Requer lambda < 0,5 para garantia de insercao; m primo recomendado.
- */
-
-typedef struct {
-    Slot *tabela;
-    int m;   /* numero de slots (primo recomendado) */
-    int n;   /* numero de elementos */
-} TabelaQuad;
-
-void quadInicializar(TabelaQuad *t, int m);
-int  quadInserir(TabelaQuad *t, int chave, int valor);
-int  quadBuscar(const TabelaQuad *t, int chave);
-int  quadRemover(TabelaQuad *t, int chave);
-void quadDestruir(TabelaQuad *t);
-
-
-/* ================================================================
- * Hash duplo (aula 20)
- * ================================================================
- * pos(i) = (h1(k) + i*h2(k)) mod m,  i = 0, 1, 2, ...
- * h1(k) = k mod m
- * h2(k) = 1 + (k mod (m-2))   - garante passo >= 1
- * Elimina agrupamento secundario; melhor distribuicao entre os tres.
- * Requer m primo (e m-2 primo para maxima qualidade).
- */
-
-typedef struct {
-    Slot *tabela;
-    int m;   /* numero de slots (primo recomendado, e m-2 primo) */
-    int n;   /* numero de elementos */
-} TabelaDouble;
-
-void dblInicializar(TabelaDouble *t, int m);
-int  dblInserir(TabelaDouble *t, int chave, int valor);
-int  dblBuscar(const TabelaDouble *t, int chave);
-int  dblRemover(TabelaDouble *t, int chave);
-void dblDestruir(TabelaDouble *t);
 
 #endif /* HASH_H */

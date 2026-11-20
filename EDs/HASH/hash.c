@@ -9,6 +9,10 @@
 #include <string.h>
 #include "hash.h"
 
+int g_hits;
+int g_miss;
+long g_colisoes;
+
 /* ================================================================
  * Funcoes de hash
  * ================================================================ */
@@ -39,35 +43,39 @@ int hashString(const char *s, int m) {
 void encInicializar(TabelaEnc *t, int m) {
     t->m      = m;
     t->n      = 0;
-    t->tabela = malloc(m * sizeof(No *));
+    t->tabela = malloc(m * sizeof(NoHash  *));
     for (int i = 0; i < m; i++)
         t->tabela[i] = NULL;
 }
 
-void encInserir(TabelaEnc *t, int chave, int valor) {
+void encInserir(TabelaEnc *t, int chave, char *receita) {
     int i    = hashDivisao(chave, t->m);
-    No *novo = malloc(sizeof(No));
+    if (t->tabela[i] != NULL) {
+        g_colisoes++;
+    }
+
+    NoHash  *novo = malloc(sizeof(NoHash ));
     novo->chave  = chave;
-    novo->valor  = valor;
+    strcpy(novo->receita, receita);
     novo->prox   = t->tabela[i];
     t->tabela[i] = novo;
     t->n++;
 }
 
-int encBuscar(const TabelaEnc *t, int chave) {
+NoHash*  encBuscar(const TabelaEnc *t, int chave) {
     int i = hashDivisao(chave, t->m);
-    No *p = t->tabela[i];
+    NoHash *p = t->tabela[i];
     while (p != NULL) {
-        if (p->chave == chave) return p->valor;
+        if (p->chave == chave) return p;
         p = p->prox;
     }
-    return -1;
+    return NULL;
 }
 
 int encRemover(TabelaEnc *t, int chave) {
     int i   = hashDivisao(chave, t->m);
-    No *p   = t->tabela[i];
-    No *ant = NULL;
+    NoHash *p   = t->tabela[i];
+    NoHash *ant = NULL;
     while (p != NULL) {
         if (p->chave == chave) {
             if (ant == NULL)
@@ -86,247 +94,13 @@ int encRemover(TabelaEnc *t, int chave) {
 
 void encDestruir(TabelaEnc *t) {
     for (int i = 0; i < t->m; i++) {
-        No *p = t->tabela[i];
+        NoHash *p = t->tabela[i];
         while (p) {
-            No *prox = p->prox;
+            NoHash  *prox = p->prox;
             free(p);
             p = prox;
         }
     }
-    free(t->tabela);
-    t->tabela = NULL;
-    t->m = t->n = 0;
-}
-
-/* ================================================================
- * Sondagem linear
- * ================================================================ */
-
-void linInicializar(TabelaLinear *t, int m) {
-    t->m      = m;
-    t->n      = 0;
-    t->tabela = malloc(m * sizeof(Slot));
-    for (int i = 0; i < m; i++)
-        t->tabela[i].estado = VAZIO;
-}
-
-int linInserir(TabelaLinear *t, int chave, int valor) {
-    int base    = chave % t->m;
-    int pri_del = -1;
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i) % t->m;
-        if (t->tabela[pos].estado == VAZIO) {
-            int dest;
-            if (pri_del != -1)
-                dest = pri_del;
-            else
-                dest = pos;
-            t->tabela[dest].chave  = chave;
-            t->tabela[dest].valor  = valor;
-            t->tabela[dest].estado = OCUPADO;
-            t->n++;
-            return 1;
-        }
-        if (t->tabela[pos].estado == DELETADO && pri_del == -1)
-            pri_del = pos;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave)
-            return 0;   /* chave duplicada */
-    }
-    if (pri_del != -1) {
-        t->tabela[pri_del].chave  = chave;
-        t->tabela[pri_del].valor  = valor;
-        t->tabela[pri_del].estado = OCUPADO;
-        t->n++;
-        return 1;
-    }
-    return 0;   /* tabela cheia */
-}
-
-int linBuscar(const TabelaLinear *t, int chave) {
-    int base = chave % t->m;
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i) % t->m;
-        if (t->tabela[pos].estado == VAZIO)
-            return -1;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave)
-            return t->tabela[pos].valor;
-    }
-    return -1;
-}
-
-int linRemover(TabelaLinear *t, int chave) {
-    int base = chave % t->m;
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i) % t->m;
-        if (t->tabela[pos].estado == VAZIO)
-            return 0;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave) {
-            t->tabela[pos].estado = DELETADO;
-            t->n--;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-void linDestruir(TabelaLinear *t) {
-    free(t->tabela);
-    t->tabela = NULL;
-    t->m = t->n = 0;
-}
-
-/* ================================================================
- * Sondagem quadratica
- * ================================================================ */
-
-void quadInicializar(TabelaQuad *t, int m) {
-    t->m      = m;
-    t->n      = 0;
-    t->tabela = malloc(m * sizeof(Slot));
-    for (int i = 0; i < m; i++)
-        t->tabela[i].estado = VAZIO;
-}
-
-int quadInserir(TabelaQuad *t, int chave, int valor) {
-    int base    = chave % t->m;
-    int pri_del = -1;
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i * i) % t->m;
-        if (t->tabela[pos].estado == VAZIO) {
-            int dest;
-            if (pri_del != -1)
-                dest = pri_del;
-            else
-                dest = pos;
-            t->tabela[dest].chave  = chave;
-            t->tabela[dest].valor  = valor;
-            t->tabela[dest].estado = OCUPADO;
-            t->n++;
-            return 1;
-        }
-        if (t->tabela[pos].estado == DELETADO && pri_del == -1)
-            pri_del = pos;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave)
-            return 0;
-    }
-    if (pri_del != -1) {
-        t->tabela[pri_del].chave  = chave;
-        t->tabela[pri_del].valor  = valor;
-        t->tabela[pri_del].estado = OCUPADO;
-        t->n++;
-        return 1;
-    }
-    return 0;
-}
-
-int quadBuscar(const TabelaQuad *t, int chave) {
-    int base = chave % t->m;
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i * i) % t->m;
-        if (t->tabela[pos].estado == VAZIO)
-            return -1;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave)
-            return t->tabela[pos].valor;
-    }
-    return -1;
-}
-
-int quadRemover(TabelaQuad *t, int chave) {
-    int base = chave % t->m;
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i * i) % t->m;
-        if (t->tabela[pos].estado == VAZIO)
-            return 0;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave) {
-            t->tabela[pos].estado = DELETADO;
-            t->n--;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-void quadDestruir(TabelaQuad *t) {
-    free(t->tabela);
-    t->tabela = NULL;
-    t->m = t->n = 0;
-}
-
-/* ================================================================
- * Hash duplo
- * ================================================================ */
-
-void dblInicializar(TabelaDouble *t, int m) {
-    t->m      = m;
-    t->n      = 0;
-    t->tabela = malloc(m * sizeof(Slot));
-    for (int i = 0; i < m; i++)
-        t->tabela[i].estado = VAZIO;
-}
-
-int dblInserir(TabelaDouble *t, int chave, int valor) {
-    int base    = chave % t->m;
-    int passo   = 1 + (chave % (t->m - 2));
-    int pri_del = -1;
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i * passo) % t->m;
-        if (t->tabela[pos].estado == VAZIO) {
-            int dest;
-            if (pri_del != -1)
-                dest = pri_del;
-            else
-                dest = pos;
-            t->tabela[dest].chave  = chave;
-            t->tabela[dest].valor  = valor;
-            t->tabela[dest].estado = OCUPADO;
-            t->n++;
-            return 1;
-        }
-        if (t->tabela[pos].estado == DELETADO && pri_del == -1)
-            pri_del = pos;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave)
-            return 0;
-    }
-    if (pri_del != -1) {
-        t->tabela[pri_del].chave  = chave;
-        t->tabela[pri_del].valor  = valor;
-        t->tabela[pri_del].estado = OCUPADO;
-        t->n++;
-        return 1;
-    }
-    return 0;
-}
-
-int dblBuscar(const TabelaDouble *t, int chave) {
-    int base  = chave % t->m;
-    int passo = 1 + (chave % (t->m - 2));
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i * passo) % t->m;
-        if (t->tabela[pos].estado == VAZIO)
-            return -1;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave)
-            return t->tabela[pos].valor;
-    }
-    return -1;
-}
-
-int dblRemover(TabelaDouble *t, int chave) {
-    int base  = chave % t->m;
-    int passo = 1 + (chave % (t->m - 2));
-    for (int i = 0; i < t->m; i++) {
-        int pos = (base + i * passo) % t->m;
-        if (t->tabela[pos].estado == VAZIO)
-            return 0;
-        if (t->tabela[pos].estado == OCUPADO && t->tabela[pos].chave == chave) {
-            t->tabela[pos].estado = DELETADO;
-            t->n--;
-            return 1;
-        }
-    }
-    return 0;
-}
-
-void dblDestruir(TabelaDouble *t) {
     free(t->tabela);
     t->tabela = NULL;
     t->m = t->n = 0;
