@@ -39,15 +39,14 @@ int desenfileira_Clientes(FilaClientes *f, Cliente *Removido) {
     if (estaVazia_FilaClientes(f)) // underflow
         return 0;
 
-    NoCliente *aux = f->frente;
-    *Removido = aux->dados;
-    f->frente = aux->prox;
+    removido = f->frente;
+    *Removido = removido->dados;
+    f->frente = removido->prox;
 
     if (f->frente == NULL) // a fila ficou vazia
         f->final = NULL;
 
     free(removido);
-    f->tamanho--;
     return 1;
 }
 

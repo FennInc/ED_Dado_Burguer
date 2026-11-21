@@ -1,6 +1,6 @@
 #ifndef UI_H
 #define UI_H
-
+#include"pilhaEnc.h"
 #include "tipos.h"
 #include "montagem.h"
 
@@ -12,14 +12,21 @@ typedef struct {
 
 /* Snapshot do estoque da cozinha para exibição no HUD */
 typedef struct {
-    int pao_inferior;
-    int pao_superior;
-    int queijo;
-    int alface;
-    int tomate;
-    InfoPerecivel carne;
-    InfoPerecivel bacon;
-    InfoPerecivel ovo;
+    int ing_pao_inferior;  // i
+    int ing_mostarda;        // m
+    int ing_queijo_cheddar;  // q
+    int ing_queijo_suico;    // s
+    int ing_bacon;          // b
+    int ing_ovo_frito;      // o
+    int ing_cebola;         // c
+    int ing_tomate;         // t
+    int ing_picles;         // p
+    int ing_alface;         // a
+    int ing_ketchup;        // k
+    int ing_pao_superior;   // z
+    InfoPerecivel ing_carne;
+    InfoPerecivel info_bacon;
+    InfoPerecivel info_ovo_frito;
 } EstoqueVisual;
 
 /* Funções utilitárias de terminal */
@@ -27,7 +34,7 @@ void limpar_tela(void);
 const char* nome_ingrediente(IdIngrediente id);
 int ler_opcao_inteira(const char *prompt, int min, int max);
 
-/* Renderização do HUD principal da partida (Passo 5.3) */
+/* Renderização do HUD principal da partida */
 void renderizar_tela_jogo(
     int turno_atual,
     int pontuacao,

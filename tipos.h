@@ -2,11 +2,11 @@
 #define TIPOS_H
 
 #define MAX_NOME 64
-#define MAX_LINHA 256
+#define MAX_LINHA 200
 #define TAM 20
 /* IDs padronizados dos ingredientes */
 typedef enum {
-    ing_pao_inferior = 1,
+    ing_pao_inferior=1,  // i
     ing_mostarda,        // m
     ing_carne,           // n
     ing_queijo_cheddar,  // q
@@ -23,9 +23,11 @@ typedef enum {
 } IdIngrediente;
 
 /* Nó usado tanto na Lista da Receita quanto na Pilha do Lanche */
+struct str_NoIngrediente;       // não precisa ser separada
+typedef struct str_NoIngrediente str_NoIngrediente;
 typedef struct {
     IdIngrediente id;
-    struct NoIngrediente *prox;
+    struct str_NoIngrediente *prox;
 } NoIngrediente;
 
 /* Estrutura de um Pedido armazenado na AVL/Hash  */

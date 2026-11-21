@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-
+#include "tipos.h"
+#define MAX_CAMADAS_VISUAIS 32
+#define LARGURA_BARRA_PACIENCIA 10
 int ler_opcao_inteira(const char *prompt, int min, int max) {
     char linha[64];
 
@@ -80,13 +82,6 @@ void como_jogar(void) {
     printf("Derrota: se a paciência do cliente da frente chegar a zero antes de o pedido ser concluído, você perdeu.\n");
     printf("Vitória: se todos os clientes forem atendidos sem que ninguém perca a paciência, você venceu.\n");
 }
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "ui.h"
-
-#define MAX_CAMADAS_VISUAIS 32
-#define LARGURA_BARRA_PACIENCIA 10
 
 void limpar_tela(void) {
 #ifdef _WIN32
@@ -96,17 +91,24 @@ void limpar_tela(void) {
 #endif
 }
 
-const char* nome_ingrediente(IdIngrediente id) {
+
+   const char *nome_ingrediente(IdIngrediente id)
+{
     switch (id) {
-        case ING_PAO_INFERIOR: return "Pao Inferior";
-        case ING_CARNE:        return "Carne";
-        case ING_QUEIJO:       return "Queijo";
-        case ING_ALFACE:       return "Alface";
-        case ING_TOMATE:       return "Tomate";
-        case ING_BACON:        return "Bacon";
-        case ING_OVO_FRITO:    return "Ovo Frito";
-        case ING_PAO_SUPERIOR: return "Pao Superior";
-        default:               return "Desconhecido";
+        case ing_pao_inferior:   return "Pao Inferior";
+        case ing_ketchup:        return "Ketchup";
+        case ing_mostarda:       return "Mostarda";
+        case ing_carne:          return "Carne";
+        case ing_queijo_cheddar: return "Queijo Cheddar";
+        case ing_queijo_suico:   return "Queijo Suico";
+        case ing_bacon:          return "Bacon";
+        case ing_ovo_frito:      return "Ovo Frito";
+        case ing_cebola:         return "Cebola";
+        case ing_tomate:         return "Tomate";
+        case ing_picles:         return "Picles";
+        case ing_alface:         return "Alface";
+        case ing_pao_superior:   return "Pao Superior";
+        default:                 return "Desconhecido";
     }
 }
 
@@ -137,7 +139,7 @@ static void imprimir_comparacao_lanche(const Pedido *pedido, const PilhaBurger *
     int qtd_receita = 0;
     int qtd_bandeja = 0;
 
-    /* 1. Copia a Lista da Receita (já está da Base [0] para o Topo [qtd-1]) */
+    /*  Copia a Lista da Receita (já está da Base [0] para o Topo [qtd-1]) */
     if (pedido != NULL) {
         const NoIngrediente *atual = pedido->receita_inicio;
         while (atual != NULL && qtd_receita < MAX_CAMADAS_VISUAIS) {
@@ -146,7 +148,7 @@ static void imprimir_comparacao_lanche(const Pedido *pedido, const PilhaBurger *
         }
     }
 
-    /* 2. Copia a Pilha da Bandeja invertendo para ficar Base [0] -> Topo [qtd-1] */
+    /*  Copia a Pilha da Bandeja invertendo para ficar Base [0] -> Topo [qtd-1] */
     if (lanche != NULL && lanche->quantidade > 0) {
         int total = lanche->quantidade;
         if (total > MAX_CAMADAS_VISUAIS) {
@@ -168,7 +170,7 @@ static void imprimir_comparacao_lanche(const Pedido *pedido, const PilhaBurger *
 
     printf(" RECEITA ALVO (Topo -> Base)      | SEU LANCHE NA BANDEJA (Topo -> Base)\n");
 
-    /* 3. Imprime de cima para baixo (do maior índice até a base 0) */
+    /*  Imprime de cima para baixo (do maior índice até a base 0) */
     for (int linha = max_linhas - 1; linha >= 0; linha--) {
         char col_esq[48] = "";
         char col_dir[48] = "";
@@ -199,9 +201,7 @@ static void imprimir_perecivel(const char *nome, InfoPerecivel info) {
     }
 }
 
-/* -------------------------------------------------------------------------
- * PASSO 5.3: RENDERIZAÇÃO COMPLETA DO HUD DA PARTIDA
- * ------------------------------------------------------------------------- */
+/*  RENDERIZAÇÃO COMPLETA DO HUD DA PARTIDA */
 void renderizar_tela_jogo(
     int turno_atual,
     int pontuacao,
@@ -233,18 +233,18 @@ void renderizar_tela_jogo(
     printf(" ESTOQUE DA COZINHA:\n");
     if (estoque != NULL) {
         printf("   Prontos: Pao Inf (%d) | Pao Sup (%d) | Queijo (%d) | Alface (%d) | Tomate (%d)\n",
-               estoque->pao_inferior,
-               estoque->pao_superior,
-               estoque->queijo,
-               estoque->alface,
-               estoque->tomate);
+               estoque->ing_pao_inferior,
+               estoque->ing_pao_superior,
+               estoque->ing_queijo_cheddar + estoque->ing_queijo_suico,
+               estoque->ing_alface,
+               estoque->ing_tomate);
 
         printf("   Pereciveis (Heap): ");
-        imprimir_perecivel("Carne", estoque->carne);
+        imprimir_perecivel("Carne", estoque->ing_carne);
         printf(" | ");
-        imprimir_perecivel("Bacon", estoque->bacon);
+        imprimir_perecivel("Bacon", estoque->info_bacon);
         printf(" | ");
-        imprimir_perecivel("Ovo", estoque->ovo);
+        imprimir_perecivel("Ovo", estoque->info_ovo_frito);
         printf("\n");
     }
 

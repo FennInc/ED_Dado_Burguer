@@ -24,7 +24,7 @@ typedef struct {
 } MetricasOrdenacao;
 
 /* Funções do Passo 2.1 */
-bool inicializar_historico(ListaHistorico *lista, int cap_inicial);
+void inicializar_historico(ListaHistorico *lista, int cap_inicial);
 bool inserir_historico(ListaHistorico *lista, RegistroHistorico reg);
 void liberar_historico(ListaHistorico *lista);
 bool carregar_historico(ListaHistorico *lista, const char *caminho);

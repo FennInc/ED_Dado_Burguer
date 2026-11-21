@@ -5,72 +5,71 @@
 #include "tipos.h"
 
 void inicializar(ListaDuplaEnc *lista) {
-    lista->ini = ing_pao_inferior;
-    lista->fim = ing_pao_superior;
+    lista->ini = NULL;
+    lista->fim = NULL;
 }
 
-void imprimir(ListaDuplaEnc *lista) {
+void imprimir(const ListaDuplaEnc *lista) {
     NodoD *aux = lista->ini;
 
-    while (aux != ing_pao_superior) {
-        printf("%d - %s - %.2f\n", aux->dado.cod, aux->dado.nome, aux->dado.preco);
+    while (aux != NULL) {
+        printf("%d\n", (int)aux->id);
         aux = aux->prox;
     }
 }
 
-void imprimirInverso(ListaDuplaEnc *lista) {
+void imprimirInverso(const ListaDuplaEnc *lista) {
     NodoD *aux = lista->fim;
 
-    while (aux != ing_pao_inferior) {
-        printf("%d - %s - %.2f\n", aux->dado.cod, aux->dado.nome, aux->dado.preco);
+    while (aux != NULL) {
+        printf("%d\n", (int)aux->id);
         aux = aux->ant;
     }
 }
 
-Produto acessar(ListaDuplaEnc *lista, int cod) {
+IdIngrediente buscar(const ListaDuplaEnc *lista, int cod) {
     NodoD *aux = lista->ini;
-    Produto prod = {-1, "", 0.0f};
 
-    while (aux != ing_pao_superior) {
-        if (aux->dado.cod == cod)
-            return aux->dado;
+    while (aux != NULL) {
+        if ((int)aux->id == cod)
+            return aux->id;
         aux = aux->prox;
     }
 
-    return prod;
+    return (IdIngrediente)0;
 }
 
-int inserirInicio(ListaDuplaEnc *lista, IdIngrediente id) {
-    NodoD *novo = (NodoD*) malloc(sizeof(NodoD));
+int inserirInicio(ListaDuplaEnc *lista, IdIngrediente ing) {
+    NodoD *novo = malloc(sizeof *novo);
     if (novo == NULL)
         return 0;
 
-    novo->dado = id;
+    novo->id = ing;
     novo->ant = NULL;
     novo->prox = lista->ini;
 
     if (lista->ini != NULL)
-        lista->ini->ant = novo; // o antigo início passa a ter um antecessor
+        lista->ini->ant = novo;
     else
-        lista->fim = novo;      // lista estava vazia: novo nodo também é o fim
+        lista->fim = novo;
 
     lista->ini = novo;
     return 1;
 }
 
-int inserirFim(ListaDuplaEnc *lista, IdIngrediente id) {
-    NodoD *novo = (NodoD*) malloc(sizeof(NodoD));
+int inserirFim(ListaDuplaEnc *lista, IdIngrediente ing) {
+    NodoD *novo = malloc(sizeof *novo);
     if (novo == NULL)
         return 0;
 
-    novo->dado = id;
+    novo->id = ing;
     novo->prox = NULL;
     novo->ant = lista->fim;
 
     if (lista->fim != NULL)
-        lista->fim->prox = novo; // o antigo fim passa a apontar para o novo nodo
+        lista->fim->prox = novo;
     else
-        lista->ini = novo;       // lista estava vazia: novo nodo também é o início
+        lista->ini = novo;
 
     lista->fim = novo;
     return 1;
@@ -79,20 +78,20 @@ int inserirFim(ListaDuplaEnc *lista, IdIngrediente id) {
 int removerPorCod(ListaDuplaEnc *lista, int cod) {
     NodoD *aux = lista->ini;
 
-    while (aux != NULL && aux->dado.cod != cod)
+    while (aux != NULL && (int)aux->id != cod)
         aux = aux->prox;
 
-    if (aux == NULL) // não encontrado
+    if (aux == NULL)
         return 0;
 
-    if (aux->ant != NULL) // existe antecessor: religa por ele
+    if (aux->ant != NULL)
         aux->ant->prox = aux->prox;
-    else                  // removendo o próprio início
+    else
         lista->ini = aux->prox;
 
-    if (aux->prox != NULL) // existe sucessor: religa por ele
+    if (aux->prox != NULL)
         aux->prox->ant = aux->ant;
-    else                   // removendo o próprio fim
+    else
         lista->fim = aux->ant;
 
     free(aux);
@@ -100,13 +99,12 @@ int removerPorCod(ListaDuplaEnc *lista, int cod) {
 }
 
 void destruir(ListaDuplaEnc *lista) {
-    NodoD *ant;
     NodoD *aux = lista->ini;
 
     while (aux != NULL) {
-        ant = aux;
-        aux = aux->prox;
-        free(ant);
+        NodoD *prox = aux->prox;
+        free(aux);
+        aux = prox;
     }
 
     lista->ini = NULL;
@@ -114,8 +112,8 @@ void destruir(ListaDuplaEnc *lista) {
 }
 
 int tamanho(ListaDuplaEnc *lista) {
-    NodoD *aux = lista->ini;
     int contador = 0;
+    NodoD *aux = lista->ini;
 
     while (aux != NULL) {
         contador++;
@@ -123,49 +121,4 @@ int tamanho(ListaDuplaEnc *lista) {
     }
 
     return contador;
-}
-
-// Funções a implementar
-void imprimirPelasPontas(ListaDuplaEnc *lista) {
-    NodoD *ini, *fim;
-    ini = lista->ini;
-    fim = lista->fim;
-
-    if(ini == NULL) {
-        return;
-    }
-
-    while(ini->ant != fim) {
-        printf("%d - %s - %.2f\n", ini->dado.cod, ini->dado.nome, ini->dado.preco);
-
-        // if abaixo para o bônus: impede de imprimir duplicado.
-        if(ini == fim) {
-            return;
-        }
-
-        printf("%d - %s - %.2f\n", fim->dado.cod, fim->dado.nome, fim->dado.preco);
-
-        ini = ini->prox;
-        fim = fim->ant;
-    }
-}
-
-void inverter(ListaDuplaEnc *lista) {
-    NodoD *aux = lista->ini;
-    NodoD *temp;
-
-    if(aux == NULL) {
-        return;
-    }
-
-    while(aux != NULL) {
-        temp = aux->ant;
-        aux->ant = aux->prox;
-        aux->prox = temp;
-        aux = aux->ant;
-    }
-
-    temp = lista->ini;
-    lista->ini = lista->fim;
-    lista->fim = temp;
 }

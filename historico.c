@@ -1,6 +1,5 @@
 #include<stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include <string.h>
 #include <errno.h>
 #include "historico.h"
@@ -62,25 +61,35 @@ static bool interpretar_linha_historico(char *linha, RegistroHistorico *reg) {
 
     return true;
 }
-void inicializar_historico(ListaHistorico *lista, int cap_inicial){ 
-    RegistroHistorico *dados=malloc(cap_inicial * sizeof(RegistroHistorico));
-    lista->tamanho = 0 ;
-    lista->capacidade = cap_inicial;
-};
-bool inserir_historico(ListaHistorico *lista, RegistroHistorico reg) {
-    if (lista->tamanho == lista->capacidade) // lista cheia
-        // Se capacity for 0, começa com 4; caso contrário, dobra
-        int nova_capacidade = (lista->capacidade == 0) ? 4 : lista->capacidade * 2;
 
-        RegistroHistorico *temp = realloc(lista->dados, nova_capacidade  *sizeof(*temp));
+void inicializar_historico(ListaHistorico *lista, int cap_inicial)
+{
+    lista->dados = malloc(cap_inicial * sizeof(*lista->dados));
+    lista->tamanho = 0;
+    lista->capacidade = cap_inicial;
+}
+
+bool inserir_historico(ListaHistorico *lista, RegistroHistorico reg)
+{
+    if (lista->tamanho == lista->capacidade) {
+        int nova_capacidade =
+            (lista->capacidade == 0) ? 4 : lista->capacidade * 2;
+
+        RegistroHistorico *temp =
+            realloc(lista->dados,
+                    nova_capacidade * sizeof(*temp));
+
         if (temp == NULL) {
-            return false; // Falha de alocação; dados originais permanecem intactos
+            return false;
         }
+
         lista->dados = temp;
         lista->capacidade = nova_capacidade;
-        lista->dados[lista->tamanho] = reg;
-        lista->tamanho++;
-        return true;
+    }
+
+    lista->dados[lista->tamanho] = reg;
+    lista->tamanho++;
+    return true;
 }
 void liberar_historico(ListaHistorico *lista) {
     if (lista == NULL) {
@@ -321,9 +330,10 @@ RegistroHistorico* gerar_copia_ordenada(
     long comparacoes = 0;
 
     /*  Cronometra APENAS o algoritmo de ordenação (sem malloc/memcpy/printf) */
-    inicia_tempo(); /* Ajuste para o nome exato da função do timer.h */
+    Timer timer;
+    timer_iniciar(&timer);
     mergesort_recursivo(copia, aux, 0, n - 1, criterio, &comparacoes);
-    double tempo_gasto = finaliza_tempo(); /* Ajuste para o retorno do timer.h */
+    double tempo_gasto = timer_parar(&timer);
 
     free(aux);
 
