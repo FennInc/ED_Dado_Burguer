@@ -6,6 +6,7 @@
 #include "avl.h"
 #include "relatorio.h"
 #include "hash.h"
+#include "heap.h"
 
 #define ARQUIVO_LOG "medicoes.log"
 
@@ -56,9 +57,7 @@ int main(int argc, char *argv[]) {
     g_hits = 0;
     g_miss = 0;
     g_colisoes = 0;
-    /* TODO: zerar tambem os contadores da hash (hits, misses, colisoes) */
 
-    /* Carregamento dos pedidos na AVL, cronometrado. */
     Timer t;
     timer_iniciar(&t);
 
