@@ -14,6 +14,6 @@ void siftUp(int a[], int i);
 void fpInserir(FilaPrioridade *fp, int valor);
 int fpMinimo(FilaPrioridade *fp);
 int fpRemoverMinimo(FilaPrioridade *fp);
-int estoqueDescartarVencidos(FilaPrioridade *fp, int turnoAtual);
+int fpDescartarVencidos(FilaPrioridade *fp, int turnoAtual);
 
 #endif

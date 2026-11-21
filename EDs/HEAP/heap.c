@@ -56,7 +56,7 @@ int fpRemoverMinimo(FilaPrioridade *fp) {
     return min;
 }
 
-int estoqueDescartarVencidos(FilaPrioridade *fp, int turnoAtual) {
+int fpDescartarVencidos(FilaPrioridade *fp, int turnoAtual) {
     int descartados = 0;
 
     if (fp == NULL) return 0;
