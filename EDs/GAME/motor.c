@@ -10,14 +10,16 @@ void motorIniciarPartida(Partida *p, int clientesTotal) {
     p->resultado = PARTIDA_EM_ANDAMENTO;
 
     /* TODO: inicializar o estoque (modulo estoque) */
+    estoqueInicializar(&p->estoque);
 }
 
 int motorIniciarTurno(Partida *p) {
-    int descartados = 0;
     if (p == NULL || p->resultado != PARTIDA_EM_ANDAMENTO) return 0;
 
     /* TODO: descartados = limpeza dos vencidos no estoque, com o turno atual */
-
+    int descartados = estoqueLimparVencidos(&p->estoque, p->turno);
+    if (descartados > 0) {
+    }
     return descartados;
 }
 
