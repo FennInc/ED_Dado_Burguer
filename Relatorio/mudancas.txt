@@ -1,0 +1,10 @@
+Struct produto da AVL foi transformada em Pedidos, comportando a receita além do código
+todas as funções de AVL que utilizavam produto agora utilizam pedidos
+adicionado um contador global de rotações, que incrementa quando cada função de rotação é chamada
+adicionado função para contar o nivel da AVL
+adicionado função para gravar no medicoes.log
+
+
+IA (Claude - modelo grátis): 
+Foi utilizada como ajudante para a organização geral d trabalho;
+Criação de funções de manipulação dos arquivos;
