@@ -8,6 +8,7 @@
 #include "hash.h"
 #include "heap.h"
 #include "sorteio.h"
+#include "pedidos.h"
 
 #define ARQUIVO_LOG "medicoes.log"
 
@@ -67,10 +68,7 @@ int main(int argc, char *argv[]) {
 
     relatorioCarregamentoAvl(raiz, tempo);
 
-    /* Intervalo dos codigos de pedido, obtido da AVL depois da carga.
-       TODO: usar as funcoes de minimo e maximo do codigo do professor
-       (os zeros abaixo so mantem o programa compilando).
-       TODO: se a arvore estiver vazia, nao sortear nada. */
+    /* Intervalo dos codigos de pedido, obtido da AVL depois da carga. */
     int menor = 0;
     int maior = 0;
 
@@ -81,30 +79,18 @@ int main(int argc, char *argv[]) {
 
     /* Um pedido sorteado por cliente. Para um teste de carga, troque
        numPedidos por uma constante maior (e evite imprimir cada pedido). */
-    Timer tb;
     int numPedidos = numClientes;
 
     for (int i = 0; i < numPedidos; i++) {
         if(raiz == NULL) break;
-        int cod = sortearIntervalo(menor, maior);
-        printf("Pedido %d: codigo %d -> ", i + 1, cod);
 
-        timer_iniciar(&tb);
-        NoHash *n = encBuscar(tabelaCache, cod);
-        if(n != NULL) {
-            g_hits++;
-            printf("Receita: %s\n", n->receita);
+        char receita[PEDIDOS_RECEITA_TAM];
+        int cod = 0;
+
+        if (pedidosObterReceita(raiz, tabelaCache, menor, maior, receita, &cod)) {
+            printf("Pedido %d: codigo %d -> Receita: %s\n", i + 1, cod, receita);
         } else {
-        NodoAvl *r = avlBuscar(raiz, cod);
-        g_tempo_buscas += timer_parar(&tb);
-        g_buscas++;
-        g_miss++;
-
-        if (r != NULL) { 
-            printf("Receita: %s\n", r->dado.receita);
-            encInserir(tabelaCache, r->dado.cod, r->dado.receita);
-        }
-        else printf("Codigo %d nao encontrado.\n", cod);
+            printf("Pedido %d: codigo %d -> nao encontrado.\n", i + 1, cod);
         }
     }
 
