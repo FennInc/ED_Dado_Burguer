@@ -7,13 +7,9 @@
 #include "relatorio.h"
 #include "hash.h"
 #include "heap.h"
+#include "sorteio.h"
 
 #define ARQUIVO_LOG "medicoes.log"
-
-/* Sorteia um inteiro no intervalo [min, max], inclusive. */
-static int sortearIntervalo(int min, int max) {
-    return min + rand() % (max - min + 1);
-}
 
 int main(int argc, char *argv[]) {
     if (argc < 3) {
@@ -39,7 +35,7 @@ int main(int argc, char *argv[]) {
     /* Semente do sorteio: fixa (medicoes repetiveis) ou variavel (jogo normal). */
     unsigned int semente = CFG_USAR_SEMENTE_FIXA ? (unsigned int)CFG_SEMENTE
                                                  : (unsigned int)time(NULL);
-    srand(semente);
+    sorteioIniciar(semente);
 
     /* Numero de clientes da partida, sorteado entre o minimo e o maximo. */
     int numClientes = sortearIntervalo(CFG_CLIENTES_MIN, CFG_CLIENTES_MAX);
@@ -71,10 +67,28 @@ int main(int argc, char *argv[]) {
 
     relatorioCarregamentoAvl(raiz, tempo);
 
+    /* Intervalo dos codigos de pedido, obtido da AVL depois da carga.
+       TODO: usar as funcoes de minimo e maximo do codigo do professor
+       (os zeros abaixo so mantem o programa compilando).
+       TODO: se a arvore estiver vazia, nao sortear nada. */
+    int menor = 0;
+    int maior = 0;
+
+    if (raiz != NULL){
+        menor = avlMinimo(raiz)->dado.cod;
+        maior = avlMaximo(raiz)->dado.cod;
+    }
+
+    /* Um pedido sorteado por cliente. Para um teste de carga, troque
+       numPedidos por uma constante maior (e evite imprimir cada pedido). */
     Timer tb;
-    int cod;
-    printf("Digite um codigo para buscar (-1 para sair): ");
-    while (scanf("%d", &cod) == 1 && cod != -1) {
+    int numPedidos = numClientes;
+
+    for (int i = 0; i < numPedidos; i++) {
+        if(raiz == NULL) break;
+        int cod = sortearIntervalo(menor, maior);
+        printf("Pedido %d: codigo %d -> ", i + 1, cod);
+
         timer_iniciar(&tb);
         NoHash *n = encBuscar(tabelaCache, cod);
         if(n != NULL) {
@@ -92,7 +106,6 @@ int main(int argc, char *argv[]) {
         }
         else printf("Codigo %d nao encontrado.\n", cod);
         }
-        printf("Digite um codigo para buscar (-1 para sair): ");
     }
 
     /* Relatorio de desempenho ao encerrar. */

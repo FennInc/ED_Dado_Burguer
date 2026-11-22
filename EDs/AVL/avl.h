@@ -36,6 +36,7 @@ NodoAvl* avlBuscar(NodoAvl *raiz, int cod);
 NodoAvl* avlInserir(NodoAvl *raiz, Pedido valor);
 
 NodoAvl* avlMinimo(NodoAvl *raiz);
+NodoAvl* avlMaximo(NodoAvl *raiz);
 NodoAvl* avlRemover(NodoAvl *raiz, int cod);
 
 NodoAvl* avlDestruir(NodoAvl *raiz);

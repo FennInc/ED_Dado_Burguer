@@ -13,7 +13,7 @@
 
 /* ---------- Sorteio (semente) ---------- */
 /* 1 = semente fixa (partidas e medicoes repetiveis); 0 = semente variavel */
-#define CFG_USAR_SEMENTE_FIXA 1
+#define CFG_USAR_SEMENTE_FIXA 0
 #define CFG_SEMENTE 42       /* usada quando CFG_USAR_SEMENTE_FIXA == 1 */
 
 /* ---------- Paciencia ---------- */

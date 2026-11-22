@@ -122,6 +122,11 @@ NodoAvl* avlMinimo(NodoAvl *raiz) {
     return raiz;
 }
 
+NodoAvl* avlMaximo(NodoAvl *raiz) {
+    while (raiz->dir != NULL) raiz = raiz->dir;
+    return raiz;
+}
+
 /* Remoção: mesmos três casos da Abp; na subida, reequilibra cada ancestral.
    Podem ser necessárias múltiplas rotações (uma por nível desequilibrado).
    Uso: raiz = avlRemover(raiz, cod); */
