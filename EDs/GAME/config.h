@@ -1,34 +1,30 @@
 #ifndef CONFIG_H
 #define CONFIG_H
+//lugar para guardar as constantes
 
-/*
- * config.h - parametros configuraveis do Dado Burger (spec, secao 3.2).
- * Cada valor deve ser justificado na secao "O jogo" do relatorio.
- * Valores marcados com PROVISORIO ainda precisam ser decididos pelo grupo.
- */
+//minimo e maximo de clientes pq quero que seja uma quantidade +- aleatoria toda vez
+#define CFG_CLIENTES_MIN 3 
+#define CFG_CLIENTES_MAX 7  
 
-/* ---------- Clientes por partida ---------- */
-#define CFG_CLIENTES_MIN 3   /* minimo de clientes sorteado por partida */
-#define CFG_CLIENTES_MAX 7   /* maximo de clientes sorteado por partida */
-
-/* ---------- Sorteio (semente) ---------- */
-/* 1 = semente fixa (partidas e medicoes repetiveis); 0 = semente variavel */
+//ngc de semente para o uso em testes 
 #define CFG_USAR_SEMENTE_FIXA 1
-#define CFG_SEMENTE 42       /* usada quando CFG_USAR_SEMENTE_FIXA == 1 */
+#define CFG_SEMENTE 42
 
-/* ---------- Paciencia ---------- */
-#define CFG_PACIENCIA_MAX 12 /* turnos por cliente. PROVISORIO */
+//tamanho das receitas
+#define CFG_RECEITA_TAM 8
 
-/* ---------- Validade dos pereciveis (turnos) ---------- */
-/* Valores do exemplo do apendice B da spec. PROVISORIO */
+//paciencia dos clientes
+#define CFG_PACIENCIA_MAX 12
+
+//validade dos pereciveis
 #define CFG_VALIDADE_CARNE 3
 #define CFG_VALIDADE_OVO   2
 #define CFG_VALIDADE_BACON 3
 
-/* ---------- Tabela hash (cache de pedidos) ---------- */
-#define CFG_HASH_M 53       /* tamanho da tabela. PROVISORIO */
+//tamanho da hash
+#define CFG_HASH_M 53
 
-/* ---------- Historico ---------- */
-#define CFG_TAM_NOME 20      /* maximo de caracteres do nome (sem o '\0') */
+//maximo de caracteres do nome
+#define CFG_TAM_NOME 20
 
-#endif /* CONFIG_H */
+#endif

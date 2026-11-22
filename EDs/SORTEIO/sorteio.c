@@ -1,3 +1,7 @@
+//IA foi utilizada para gerar parte da lógica de sorteio. toda a utilização dessas funções
+//dentro do fluxo do código foi feito por mim, sophy, manualmente.
+//seus comentários são sinalizados pelo uso de '/* */'
+
 #include <stdlib.h>
 #include "sorteio.h"
 

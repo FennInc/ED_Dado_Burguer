@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < numPedidos; i++) {
         if(raiz == NULL) break;
 
-        char receita[PEDIDOS_RECEITA_TAM];
+        char receita[CFG_RECEITA_TAM];
         int cod = 0;
 
         if (pedidosObterReceita(raiz, tabelaCache, menor, maior, receita, &cod)) {

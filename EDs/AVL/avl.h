@@ -11,14 +11,14 @@ typedef struct{
 
 typedef struct str_NodoAvl NodoAvl;
 
-struct str_NodoAvl {
+struct str_NodoAvl { //da dando erro de compilação mas n acho que é nada
     Pedido  dado;
     NodoAvl *esq;
     NodoAvl *dir;
     int      altura;   /* folha = 0; NULL = -1 (por convenção) */
 };
 
-//DESGRAÇA DE CONTRATOS
+//contratos
 extern int g_rotacoes;
 extern int g_buscas;
 extern int g_comparacoes;
@@ -42,7 +42,5 @@ NodoAvl* avlRemover(NodoAvl *raiz, int cod);
 NodoAvl* avlDestruir(NodoAvl *raiz);
 
 int avlContarNos(const NodoAvl *raiz);
-
-void emOrdem(const NodoAvl *raiz);
 
 #endif

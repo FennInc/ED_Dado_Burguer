@@ -1,9 +1,11 @@
+//IA foi utilizada para gerar parte da lógica de sorteio. toda a utilização dessas funções
+//dentro do fluxo do código foi feito por mim, sophy, manualmente.
+//seus comentários são sinalizados pelo uso de '/* */'
+
 #ifndef SORTEIO_H
 #define SORTEIO_H
 
 /*
- * sorteio.h - sorteio de inteiros em um intervalo.
- *
  * O rand() do C garante apenas valores ate 32767 (RAND_MAX >= 32767), e no
  * Windows e exatamente esse o maximo. Para cobrir intervalos maiores, como
  * os codigos de pedido (centenas de milhares), este modulo combina duas
@@ -18,4 +20,4 @@ void sorteioIniciar(unsigned int semente);
    (max - min + 1) deve ser de ate 1.073.741.824. */
 int sortearIntervalo(int min, int max);
 
-#endif /* SORTEIO_H */
+#endif

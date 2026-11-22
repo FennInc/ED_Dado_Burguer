@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int g_rotacoes = 0; // trem global de rotações
-int g_comparacoes = 0; // trem global de comparações
+int g_rotacoes = 0; // global de rotações
+int g_comparacoes = 0; // global de comparações
 int g_buscas = 0; //global de buscas
 double g_tempo_buscas = 0.0; //global de tempo de buscas
 
@@ -85,11 +85,10 @@ NodoAvl* avlReequilibrar(NodoAvl *raiz) {
     return raiz;   /* sem desequilíbrio */
 }
 
-/* Busca: idêntica à Abp — a altura garantida torna-a O(log n). */
-//incrementa a cada comparação
+/* Busca: idêntica à Abp — a altura garantida torna-a O(log n). */ 
 NodoAvl* avlBuscar(NodoAvl *raiz, int cod) {
     if (raiz == NULL)           return NULL;
-    if (cod == raiz->dado.cod){ g_comparacoes++; return raiz; }
+    if (cod == raiz->dado.cod){ g_comparacoes++; return raiz; } //incrementa a cada comparação
     if (cod < raiz->dado.cod){ g_comparacoes++; return avlBuscar(raiz->esq, cod); }
     g_comparacoes++;
     return avlBuscar(raiz->dir, cod);
@@ -122,6 +121,7 @@ NodoAvl* avlMinimo(NodoAvl *raiz) {
     return raiz;
 }
 
+// mema coisa do minimo mas máximo
 NodoAvl* avlMaximo(NodoAvl *raiz) {
     while (raiz->dir != NULL) raiz = raiz->dir;
     return raiz;
@@ -166,12 +166,4 @@ NodoAvl* avlDestruir(NodoAvl *raiz) {
 int avlContarNos(const NodoAvl *raiz) {
     if (raiz == NULL) return 0;
     return 1 + avlContarNos(raiz->esq) + avlContarNos(raiz->dir);
-}
-
-void emOrdem(const NodoAvl *raiz) {   // também chamado: central
-    if (raiz == NULL) return;
-
-    emOrdem(raiz->esq);               // 1. primeiro a esquerda
-    printf("%d ", raiz->dado.cod);   // 2. visita a RAIZ (no meio)
-    emOrdem(raiz->dir);               // 3. depois a direita
 }

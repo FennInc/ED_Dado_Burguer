@@ -1,9 +1,6 @@
 /* hash.h
  * TAD Tabela Hash - funcoes de hash e tratamento de colisao.
  * Cobre o conteudo das aulas 19 e 20 de INF01203 - UFRGS.
- *
- * Compilar:
- *   gcc -Wall -o hash_demo hash_demo.c hash.c -lm
  */
 
 #ifndef HASH_H
@@ -38,9 +35,9 @@ int hashString(const char *s, int m);
  * Custo medio de busca: O(1 + lambda).
  */
 
-typedef struct NoHash {
+typedef struct NoHash { //erro do compilador q n afeta nada
     int chave;
-    char receita[8];
+    char receita[8]; //alterado para ter a receita
     struct NoHash *prox;
 } NoHash;
 
@@ -71,4 +68,4 @@ typedef struct {
     EstadoSlot estado;
 } Slot;
 
-#endif /* HASH_H */
+#endif

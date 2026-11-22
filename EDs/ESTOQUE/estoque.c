@@ -2,6 +2,7 @@
 #include "config.h"
 #include "estoque.h"
 
+//inicializa o estoque, zerando tudo
 void estoqueInicializar(Estoque *est) {
     if (est == NULL) return;
 
@@ -14,10 +15,12 @@ void estoqueInicializar(Estoque *est) {
     }
 }
 
+//verifica se o ingrediente acessado é perecivel
 int estoqueEhPerecivel(char ing) {
     return ing == 'n' || ing == 'o' || ing == 'b';
 }
 
+//verifica qual dos ingredientes são dos perenes
 int estoqueIndicePerene(char ing) {
     switch (ing) {
     case 's': return PERENE_QUEIJO_SUICO;
@@ -28,6 +31,7 @@ int estoqueIndicePerene(char ing) {
     }
 }
 
+//pega o nome dos igredientes
 const char *estoqueNomeIngrediente(char ing) {
     switch (ing) {
     case 'n': return "carne";
@@ -41,6 +45,7 @@ const char *estoqueNomeIngrediente(char ing) {
     }
 }
 
+//pega a validade dos pereciveis
 int estoqueValidade(char ing) {
     switch (ing) {
     case 'n': return CFG_VALIDADE_CARNE;
@@ -50,6 +55,7 @@ int estoqueValidade(char ing) {
     }
 }
 
+//faz o link entre o char do ingrediente e o heap
 FilaPrioridade *estoqueHeapPerecivel(Estoque *est, char ing) {
     if (est == NULL) return NULL;
 
@@ -61,6 +67,7 @@ FilaPrioridade *estoqueHeapPerecivel(Estoque *est, char ing) {
     }
 }
 
+//limpa os pereciveis que passaram da validade de todos os heaps
 int estoqueLimparVencidos(Estoque *est, int turnoAtual) {
     if (est == NULL) return 0;
 
@@ -69,6 +76,7 @@ int estoqueLimparVencidos(Estoque *est, int turnoAtual) {
          + fpDescartarVencidos(&est->bacon, turnoAtual);
 }
 
+//acao de preparar um ingrediente
 int estoquePreparar(Estoque *est, char ing, int turnoAtual, int *outVencimento) {
     if (est == NULL) return -1;
 
@@ -97,6 +105,7 @@ int estoquePreparar(Estoque *est, char ing, int turnoAtual, int *outVencimento) 
     return -1;
 }
 
+//acao de consumir um ingrediente
 int estoqueConsumir(Estoque *est, char ing, int *outVencimento) {
     if (est == NULL) return -1;
 
@@ -127,6 +136,7 @@ int estoqueConsumir(Estoque *est, char ing, int *outVencimento) {
     return -1;
 }
 
+//funcao de teste para inserir um ingrediente com validade customizada nas heaps
 int estoqueInserirVencimento(Estoque *est, char ing, int vencimento) {
     if (est == NULL || !estoqueEhPerecivel(ing)) return -1;
 
@@ -139,6 +149,7 @@ int estoqueInserirVencimento(Estoque *est, char ing, int vencimento) {
     return 1;
 }
 
+//ve a quantidade no estoque de x ingrediente
 int estoqueQuantidade(const Estoque *est, char ing) {
     if (est == NULL) return -1;
 

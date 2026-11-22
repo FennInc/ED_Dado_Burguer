@@ -4,7 +4,7 @@
 #define CAP 10
 
 typedef struct {
-    int dados[CAP];
+    int dados[CAP]; //guarda cada ingrediente da heap com sua validade no vetor (validade = cod)
     int tam;
 } FilaPrioridade;
 

@@ -9,9 +9,9 @@
 #include <string.h>
 #include "hash.h"
 
-int g_hits;
-int g_miss;
-long g_colisoes;
+int g_hits; //global de hits
+int g_miss; //global de misses
+long g_colisoes; //global de colisoes
 
 /* ================================================================
  * Funcoes de hash
@@ -51,7 +51,7 @@ void encInicializar(TabelaEnc *t, int m) {
 void encInserir(TabelaEnc *t, int chave, char *receita) {
     int i    = hashDivisao(chave, t->m);
     if (t->tabela[i] != NULL) {
-        g_colisoes++;
+        g_colisoes++; //incrementa as colisoes
     }
 
     NoHash  *novo = malloc(sizeof(NoHash ));

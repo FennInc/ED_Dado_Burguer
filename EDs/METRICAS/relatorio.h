@@ -1,29 +1,10 @@
+//IA foi utilizada para gerar parte da lógica de manipulação de arquivos e formatação no terminal.
+//seus comentários são sinalizados pelo uso de '/* */'
+
 #ifndef RELATORIO_H
 #define RELATORIO_H
 
 #include "avl.h" /* NodoAvl, usado em relatorioCarregamentoAvl */
-
-/*
- * relatorio.h - medicoes.log e Relatorio de Desempenho (spec, secao 5).
- *
- * Cada funcao escreve na tela e no arquivo, no formato do apendice B.
- * As funcoes apenas formatam e gravam. Os valores das metricas (media de
- * comparacoes, taxa de acerto, fator de carga, etc.) devem vir calculados
- * por quem os mede.
- *
- * Fluxo tipico:
- *   relatorioIniciar("medicoes.log");   -- uma vez por execucao
- *   relatorioParametros(semente, n);
- *   relatorioCarregamentoAvl(raiz, tempo);
- *   ...
- *   relatorioTitulo();                  -- ao encerrar a partida
- *   relatorioBuscasAvl(...);
- *   relatorioHash(...);
- *   relatorioFim();
- *
- * Cada chamada acrescenta ao arquivo (modo "a"). O arquivo so e
- * sobrescrito em relatorioIniciar.
- */
 
 /* Cria ou sobrescreve o arquivo. Retorna 0 em sucesso e -1 em erro. */
 int relatorioIniciar(const char *caminho);

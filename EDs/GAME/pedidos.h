@@ -3,6 +3,7 @@
 
 #include "avl.h"
 #include "hash.h"
+#include "config.h"
 
 /*
  * pedidos.h - obtencao do pedido de cada cliente (spec, secoes 3.3 e 4.3).
@@ -19,8 +20,7 @@
  * Quem recebe a receita (string) converte para a lista encadeada do
  * pedido, se precisar.
  */
-
-#define PEDIDOS_RECEITA_TAM 8 /* 7 caracteres da receita + '\0' */
+ /* 7 caracteres da receita + '\0' */
 
 /* Obtem o pedido do proximo cliente.
  *   raiz, cache      : AVL com os pedidos e tabela hash usada como cache
@@ -30,6 +30,6 @@
  * Retorna 1 em caso de sucesso e 0 se o codigo sorteado nao foi encontrado
  * (a receita fica vazia). */
 int pedidosObterReceita(NodoAvl *raiz, TabelaEnc *cache, int menor, int maior,
-                        char receita[PEDIDOS_RECEITA_TAM], int *codigoSorteado);
+                        char receita[CFG_RECEITA_TAM], int *codigoSorteado);
 
 #endif /* PEDIDOS_H */

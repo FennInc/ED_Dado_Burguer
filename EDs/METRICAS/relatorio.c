@@ -1,3 +1,6 @@
+//IA foi utilizada para gerar parte da lógica de manipulação de arquivos e formatação no terminal.
+//seus comentários são sinalizados pelo uso de '/* */'
+
 #include <stdio.h>
 #include <string.h>
 #include "relatorio.h"
@@ -29,18 +32,21 @@ static void emitir(const char *linha) {
     }
 }
 
+//ecreve o titulo da seção
 static void emitirSecao(const char *titulo) {
     char linha[REL_TAM_LINHA];
     snprintf(linha, sizeof(linha), "-- %s --\n", titulo);
     emitir(linha);
 }
 
+//escreve variavel do tipo int
 static void emitirInt(const char *nome, long valor) {
     char linha[REL_TAM_LINHA];
     snprintf(linha, sizeof(linha), "%s: %ld\n", nome, valor);
     emitir(linha);
 }
 
+//escreve variavel do tipo double
 static void emitirDouble(const char *nome, double valor, int casas,
                          const char *unidade) {
     char linha[REL_TAM_LINHA];
@@ -50,6 +56,7 @@ static void emitirDouble(const char *nome, double valor, int casas,
 
 /* ---------- Interface publica ---------- */
 
+//inicia o relatório
 int relatorioIniciar(const char *caminho) {
     if (caminho != NULL) {
         strncpy(g_caminho, caminho, REL_TAM_CAMINHO - 1);
@@ -66,6 +73,7 @@ int relatorioIniciar(const char *caminho) {
     return 0;
 }
 
+//verifica se deve printar o relatorio
 void relatorioMostrarNaTela(int ligado) {
     g_mostrarNaTela = ligado ? 1 : 0;
 }

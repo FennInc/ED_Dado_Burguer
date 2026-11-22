@@ -1,7 +1,6 @@
 #include <stddef.h>
 #include "heap.h"
 
-/* Restaura a propriedade do min-heap descendo o no i. */
 void heapify(int a[], int n, int i) {
     int menor = i;
     int esq   = 2 * i + 1;
@@ -18,7 +17,6 @@ void heapify(int a[], int n, int i) {
     }
 }
 
-/* Restaura a propriedade do min-heap subindo o no i. */
 void siftUp(int a[], int i) {
     while (i > 0) {
         int pai = (i - 1) / 2;
@@ -56,18 +54,15 @@ int fpRemoverMinimo(FilaPrioridade *fp) {
     return min;
 }
 
+//descarta o item vencido da heap
 int fpDescartarVencidos(FilaPrioridade *fp, int turnoAtual) {
     int descartados = 0;
 
     if (fp == NULL) return 0;
 
-    while (fp->tam > 0 && fp->dados[0] <= turnoAtual) {
-        fp->tam--;
-        if (fp->tam > 0) {
-            fp->dados[0] = fp->dados[fp->tam];
-            heapify(fp->dados, fp->tam, 0);
-        }
-        descartados++;
+    while (fp->tam > 0 && fp->dados[0] <= turnoAtual) {  //se a validade for menor ou igual que o turno atual ent estragou
+        if(fpRemoverMinimo(fp) >=  0)
+            descartados++;
     }
     return descartados;
 }
