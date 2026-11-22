@@ -2,6 +2,7 @@
 #define PILHAENC_H
 
 #include "tipos.h"
+#include <stdbool.h>
 
 typedef struct {
     int cod;

@@ -10,7 +10,6 @@ typedef struct{
 }Pedido; //transformei o produto na formatação de pedido
 
 typedef struct str_NodoAvl NodoAvl;
-
 struct str_NodoAvl { //da dando erro de compilação mas n acho que é nada
     Pedido  dado;
     NodoAvl *esq;

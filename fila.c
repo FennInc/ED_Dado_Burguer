@@ -2,8 +2,6 @@
 #include <stdlib.h>
 #include "fila.h"
 #include "tipos.h"
-#include <stdio.h>
-#include <stdlib.h>
 #include "fila.h"
 
 void inicializa_FilaClientes(FilaClientes *f) {

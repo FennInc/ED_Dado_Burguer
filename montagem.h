@@ -3,11 +3,12 @@
 
 #include "tipos.h"
 
-typedef struct  {
+typedef struct str_NodoD NodoD;
+struct str_NodoD {
     NodoD *ant;
     NodoD *prox;
     IdIngrediente id;
-}NodoD;
+};
 
 typedef struct {
     NodoD *ini;

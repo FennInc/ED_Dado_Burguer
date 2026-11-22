@@ -23,12 +23,11 @@ typedef enum {
 } IdIngrediente;
 
 /* Nó usado tanto na Lista da Receita quanto na Pilha do Lanche */
-struct str_NoIngrediente;       // não precisa ser separada
-typedef struct str_NoIngrediente str_NoIngrediente;
-typedef struct {
+typedef struct str_NoIngrediente NoIngrediente;
+struct str_NoIngrediente {
     IdIngrediente id;
-    struct str_NoIngrediente *prox;
-} NoIngrediente;
+    NoIngrediente *prox;
+};
 
 /* Estrutura de um Pedido armazenado na AVL/Hash  */
 typedef struct {

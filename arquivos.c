@@ -8,7 +8,7 @@ int main ( int argc , char * argv []) {
     int total = 0;
     JOGADOR jogadores[MAX_LINHA]={};
     if ( argc < 3) {
-    fprintf ( stderr , " Uso : % s < pedidos > < historico >\ n" , argv[0]) ;
+    fprintf ( stderr , " Uso : % s < pedidos > < historico >\n" , argv[0]) ;
     return 1;
     }
     FILE * fp = fopen ( argv [1] , " r") ; /* abre o arquivo de pedidos*/
