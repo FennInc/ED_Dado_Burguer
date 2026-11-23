@@ -3,6 +3,7 @@
 #include "pedidos.h"
 #include "sorteio.h"
 #include "timer.h"
+#include "tipos.h"
 
 //pedidos sendo sorteados aqui, integração entre a avl e a hash q eu bati a cabeça tentando fazer no arq original delas
 int pedidosObterReceita(NodoAvl *raiz, TabelaEnc *cache, int menor, int maior, char receita[CFG_RECEITA_TAM], int *codigoSorteado) {
@@ -42,7 +43,23 @@ int pedidosObterReceita(NodoAvl *raiz, TabelaEnc *cache, int menor, int maior, c
         encInserir(cache, r->dado.cod, r->dado.receita);
         return 1;
     }
-
-    receita[0] = '\0';
     return 0;
+}
+
+int converteIngId(char ing) {
+    switch (ing) {
+    case 'n': return ing_carne;
+    case 'o': return ing_ovo_frito;
+    case 'b': return ing_bacon;
+    case 's': return ing_queijo_suico;
+    case 'q': return ing_queijo_cheddar;
+    case 'c': return ing_cebola;
+    case 't': return ing_tomate;
+    case 'z': return ing_pao_superior;
+    case 'k': return ing_ketchup;
+    case 'm': return ing_mostarda;
+    case 'p': return ing_picles;
+    case 'a': return ing_alface;
+    default:  return -1;
+    }
 }

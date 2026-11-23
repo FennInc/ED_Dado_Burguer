@@ -4,6 +4,7 @@
 #include <string.h>
 #include <errno.h>
 #include "tipos.h"
+#include "estoque.h"
 #define MAX_CAMADAS_VISUAIS 32
 #define LARGURA_BARRA_PACIENCIA 10
 int ler_opcao_inteira(const char *prompt, int min, int max) {
@@ -191,15 +192,6 @@ static void imprimir_comparacao_lanche(const Pedido *pedido, const PilhaBurger *
     }
 }
 
-/* Formata cada perecível exibindo o vencimento do topo apenas se houver unidades */
-static void imprimir_perecivel(const char *nome, InfoPerecivel info) {
-    if (info.quantidade > 0) {
-        printf("%s: %d (vence T:%d)", nome, info.quantidade, info.proximo_vencimento);
-    } else {
-        printf("%s: 0", nome);
-    }
-}
-
 /*  RENDERIZAÇÃO COMPLETA DO HUD DA PARTIDA */
 void renderizar_tela_jogo(
     int turno_atual,
@@ -208,7 +200,7 @@ void renderizar_tela_jogo(
     const Cliente *cliente,
     const Pedido *pedido,
     const PilhaBurger *lanche,
-    const EstoqueVisual *estoque
+    const Estoque *estoque
 ) {
     limpar_tela();
 
@@ -231,20 +223,15 @@ void renderizar_tela_jogo(
 
     printf(" ESTOQUE DA COZINHA:\n");
     if (estoque != NULL) {
-        printf("   Prontos: Pao Inf (%d) | Pao Sup (%d) | Queijo (%d) | Alface (%d) | Tomate (%d)\n",
-               estoque->ing_pao_inferior,
-               estoque->ing_pao_superior,
-               estoque->ing_queijo_cheddar + estoque->ing_queijo_suico,
-               estoque->ing_alface,
-               estoque->ing_tomate);
-
-        printf("   Pereciveis (Heap): ");
-        imprimir_perecivel("Carne", estoque->ing_carne);
-        printf(" | ");
-        imprimir_perecivel("Bacon", estoque->info_bacon);
-        printf(" | ");
-        imprimir_perecivel("Ovo", estoque->info_ovo_frito);
-        printf("\n");
+        printf("  Pao ilimitado | Mostarda ilimitado | Ketchup ilimitado | Picles ilimitado | Alface ilimitado |\n| Queijo Cheddar (%d) | Queijo suico (%d) | Tomate (%d) | Cebola (%d) |\n| Carne (%d) | Ovo Frito (%d) | Bacon (%d) |",
+               estoque->perenes[PERENE_QUEIJO_CHEDDAR],
+               estoque->perenes[PERENE_QUEIJO_SUICO],
+               estoque->perenes[PERENE_TOMATE], 
+               estoque->perenes[PERENE_CEBOLA],
+               estoque->carne.tam,
+               estoque->ovo.tam,
+               estoque->bacon.tam
+        );
     }
 
     printf("========================================================================\n");
@@ -256,5 +243,4 @@ void renderizar_tela_jogo(
     printf("   [0] Abandonar partida\n");
 }
 
-//Copia os dados do estoque atual para o snapshot visual EstoqueVisual.
 //Imprime o HUD da partida no terminal com pedido, lanche, estoque, fila e turnos/paciencia.

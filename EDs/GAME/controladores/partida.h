@@ -1,5 +1,5 @@
-#ifndef MOTOR_H
-#define MOTOR_H
+#ifndef PARTIDA_H
+#define PARTIDA_H
 #include "estoque.h"
 
 //estados da partida

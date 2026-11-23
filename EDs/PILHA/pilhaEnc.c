@@ -12,25 +12,24 @@ int estaVaziaPilha(PilhaBurger *p) {
 }
 
 int empilha_ingrediente(PilhaBurger *p, IdIngrediente id) {
-    if (p->topo== NULL && id == ing_pao_inferior) {
-        printf("Erro: o primeiro ingrediente deve ser o pão inferior.\n");
-        return 0; 
-    }
     NoIngrediente *novo = (NoIngrediente*) malloc(sizeof(NoIngrediente));
     if (novo == NULL)
         return 0;
-
+    if (p->topo->id == ing_pao_superior){
+        printf("nao eh possivel adicionar ingrediente no lanche fechado.");
+        return -1;
+    }
+    
     novo->id = id;
     novo->prox = p->topo; // aponta para o antigo topo
     p->topo = novo;        // o novo nodo passa a ser o topo
     p->quantidade++;
     return 1;
 }
-bool desempilha_ingrediente(PilhaBurger *p, IdIngrediente *id_removido) {
+bool desempilha_ingrediente(PilhaBurger *p) {
     if (estaVaziaPilha(p)) // underflow
         return false;
     NoIngrediente *aux = p->topo;
-    *id_removido = aux->id;
     p->topo = aux->prox;
     free(aux);
     p->quantidade--;

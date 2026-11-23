@@ -34,7 +34,7 @@ static void emitirRelatorioDesempenho(TabelaEnc *cache) {
     relatorioFim();
 }
 
-//limpar caractere da entrada
+//limpar caractere da entrada soh pra facilitar a vida
 static void limparEntrada(void) {
     int ch;
     while ((ch = getchar()) != '\n' && ch != EOF) {
@@ -79,7 +79,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
     snprintf(pedidoVis.nome_lanche, sizeof(pedidoVis.nome_lanche), "Receita: %s", receitaAtual);
 
     PilhaBurger lanche = {0};
-    b1_inicializar_montagem_e_receita(&lanche, &pedidoVis, receitaAtual);
+    inicializaPilha(&lanche);
 
     while (!partidaTerminou(&partida)) {
         int descartados = IniciarTurno(&partida);
@@ -87,11 +87,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
             printf("Descartados por validade neste turno: %d\n", descartados);
         }
 
-        EstoqueVisual estVis;
-        b1_preencher_estoque_visual(&partida.estoque, &estVis);
-
-        b1_renderizar_partida(&partida, &fila, &pedidoVis, &lanche, &estVis,
-                              pacienciaAtual, codPedido, receitaAtual);
+        renderizar_tela_jogo(partida.turno, partida.clientesAtendidos, partida.clientesTotal - partida.clientesAtendidos, fila.frente, &pedidoVis, &lanche, &partida.estoque);
 
         //Acoes: 0 = abandonar, 1 = preparar, 2 = adicionar, 3 = remover
         int acao = ler_opcao_inteira("\nEscolha uma acao: ", 0, 3);
@@ -130,14 +126,15 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
             printf("Adicionar ingrediente (n=carne, o=ovo, b=bacon, s=queijo suico, q=cheddar, c=cebola, t=tomate, z=pao de cima, k=ketchup, m=mostarda, p=picles, a=alface): ");
             if (scanf(" %c", &ing) == 1) {
                 limparEntrada();
-
                 int vencConsumido = -1;
                 int ok = estoqueConsumir(&partida.estoque, ing, &vencConsumido);
                 if (ok == 1) {
-                    if (b1_adicionar_na_pilha(&lanche, ing)) {
+                    if (empilha_ingrediente(&lanche, converteIngId(ing)) < 0) {
+                        printf("Não pode adicionar ingrediente encima do pão!!!!!!\n");
+                    } 
+                    else if (empilha_ingrediente(&lanche, converteIngId(ing))){
                         printf("Adicionou %s ao lanche.\n", estoqueNomeIngrediente(ing));
-
-                        if (ing == 'z' && b1_validar_lanche(&lanche, &pedidoVis, receitaAtual)) {
+                        if (ing == 'z' && validar_hamburguer(&lanche, &pedidoVis)) {
                             //pedido concluido
                             printf("Pedido concluido com sucesso!\n");
 
@@ -145,6 +142,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
                             desenfileira_Clientes(&fila, &atendido);
                             turnosAcaoRealizada(&partida, &pacienciaAtual, 1);
 
+                            //PARTIDA N ACABOU
                             if (!partidaTerminou(&partida)) {
                                 pacienciaAtual = CFG_PACIENCIA_MAX;
                                 if (!pedidosObterReceita(raiz, cache, menorCod, maiorCod, receitaAtual, &codPedido)) {
@@ -153,7 +151,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
                                 pedidoVis.codigo = codPedido;
                                 snprintf(pedidoVis.nome_lanche, sizeof(pedidoVis.nome_lanche),
                                          "Receita: %s", receitaAtual);
-                                b1_inicializar_montagem_e_receita(&lanche, &pedidoVis, receitaAtual);
+                                          inicializaPilha(&lanche);
                             } else {
                                 receitaAtual[0] = '\0';
                             }
@@ -173,7 +171,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
 
         } else if (acao == 3) {
             char rem = '\0';
-            if (b1_remover_do_topo(&lanche, &rem)) {
+            if (desempilha_ingrediente(&lanche)) {
                 printf("Removeu %s do topo.\n", estoqueNomeIngrediente(rem));
                 turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
             } else {
@@ -185,7 +183,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
     printf("\n=== FIM DA PARTIDA ===\n");
     printf("Atendidos: %d/%d | Turnos: %d | Pontuacao: %d\n", partida.clientesAtendidos, partida.clientesTotal, partida.turno, partidaPontuacao(&partida));
 
-    b1_registrar_e_salvar_historico(hist, caminhoHist, &partida);
+    salvar_historico(hist, caminhoHist);
 
     Cliente remCli;
     while (desenfileira_Clientes(&fila, &remCli)) {

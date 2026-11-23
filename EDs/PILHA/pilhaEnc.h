@@ -18,7 +18,7 @@ typedef struct {
 void inicializaPilha(PilhaBurger *p);
 int estaVaziaPilha(PilhaBurger *p);
 int empilha_ingrediente(PilhaBurger *p, IdIngrediente id);
-bool desempilha_ingrediente(PilhaBurger *p, IdIngrediente *id_removido);
+bool desempilha_ingrediente(PilhaBurger *p);
 int topo(PilhaBurger *p, IdIngrediente *id_topo);
 int tamanhoPilha(PilhaBurger *p);
 bool validar_hamburguer(const PilhaBurger *pilha, const Pedido *pedido);

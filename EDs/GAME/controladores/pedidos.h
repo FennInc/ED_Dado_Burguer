@@ -8,4 +8,6 @@
 int pedidosObterReceita(NodoAvl *raiz, TabelaEnc *cache, int menor, int maior,
                         char receita[CFG_RECEITA_TAM], int *codigoSorteado);
 
-#endif /* PEDIDOS_H */
+int converteIngId(char ing);
+
+#endif
