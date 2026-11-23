@@ -27,4 +27,9 @@ void renderizar_tela_jogo(
     const Estoque *estoque
 );
 
+void impressao_menu_principal(void);
+void como_jogar(void);
+void imprimir_barra_paciencia(int atual, int maxima);
+void imprimir_comparacao_lanche(const Pedido *pedido, const PilhaBurger *lanche);
+
 #endif

@@ -65,7 +65,6 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
         enfileira_FilaClientes(&fila, c);
     }
 
-    int pacienciaAtual = CFG_PACIENCIA_MAX;
     int codPedido = 0;
     char receitaAtual[CFG_RECEITA_TAM];
 
@@ -87,7 +86,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
             printf("Descartados por validade neste turno: %d\n", descartados);
         }
 
-        renderizar_tela_jogo(partida.turno, partida.clientesAtendidos, partida.clientesTotal - partida.clientesAtendidos, fila.frente, &pedidoVis, &lanche, &partida.estoque);
+        renderizar_tela_jogo(partida.turno, partida.clientesAtendidos, partida.clientesTotal - partida.clientesAtendidos, &(fila.frente->dados), &pedidoVis, &lanche, &partida.estoque);
 
         //Acoes: 0 = abandonar, 1 = preparar, 2 = adicionar, 3 = remover
         int acao = ler_opcao_inteira("\nEscolha uma acao: ", 0, 3);
@@ -110,7 +109,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
                     } else {
                         printf("Preparou %s.\n", estoqueNomeIngrediente(ing));
                     }
-                    turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
+                    turnosAcaoRealizada(&partida, &fila.frente->dados.paciencia_atual, 0);
                 } else if (res == 0) {
                     printf("Estoque cheio para %s.\n", estoqueNomeIngrediente(ing));
                 } else if (estoqueEhIlimitado(ing)) {
@@ -139,12 +138,11 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
                             printf("Pedido concluido com sucesso!\n");
 
                             Cliente atendido;
-                            desenfileira_Clientes(&fila, &atendido);
-                            turnosAcaoRealizada(&partida, &pacienciaAtual, 1);
+                            desenfileira_FilaClientes(&fila, &atendido);
+                            turnosAcaoRealizada(&partida, &fila.frente->dados.paciencia_atual, 1);
 
                             //PARTIDA N ACABOU
                             if (!partidaTerminou(&partida)) {
-                                pacienciaAtual = CFG_PACIENCIA_MAX;
                                 if (!pedidosObterReceita(raiz, cache, menorCod, maiorCod, receitaAtual, &codPedido)) {
                                     receitaAtual[0] = '\0';
                                 }
@@ -157,9 +155,9 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
                             }
                         } else if (ing == 'z') {
                             printf("Lanche incorreto! Turno gasto.\n");
-                            turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
+                            turnosAcaoRealizada(&partida, &fila.frente->dados.paciencia_atual, 0);
                         } else {
-                            turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
+                            turnosAcaoRealizada(&partida, &fila.frente->dados.paciencia_atual, 0);
                         }
                     }
                 } else if (ok == 0) {
@@ -173,7 +171,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
             char rem = '\0';
             if (desempilha_ingrediente(&lanche)) {
                 printf("Removeu %s do topo.\n", estoqueNomeIngrediente(rem));
-                turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
+                turnosAcaoRealizada(&partida, &fila.frente->dados.paciencia_atual, 0);
             } else {
                 printf("Lanche ja esta vazio.\n");
             }
@@ -186,7 +184,7 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
     salvar_historico(hist, caminhoHist);
 
     Cliente remCli;
-    while (desenfileira_Clientes(&fila, &remCli)) {
+    while (desenfileira_FilaClientes(&fila, &remCli)) {
     }
 
     //Relatorio de desempenho ao encerrar a partida antes de voltar ao menu.

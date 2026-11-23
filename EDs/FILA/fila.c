@@ -31,7 +31,7 @@ int enfileira_FilaClientes(FilaClientes *f, Cliente cliente) {
     return 1;
 }
 
-int desenfileira_Clientes(FilaClientes *f, Cliente *Removido) {
+int desenfileira_FilaClientes(FilaClientes *f, Cliente *Removido) {
     NoCliente *removido;
 
     if (estaVazia_FilaClientes(f)) // underflow

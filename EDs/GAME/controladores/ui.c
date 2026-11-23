@@ -113,7 +113,7 @@ void limpar_tela(void) {
 }
 
 /* Desenha a barra proporcional [#######---] 7/10 turnos */
-static void imprimir_barra_paciencia(int atual, int maxima) {
+void imprimir_barra_paciencia(int atual, int maxima) {
     if (atual < 0) atual = 0;
     if (maxima <= 0) maxima = 1;
 
@@ -133,7 +133,7 @@ static void imprimir_barra_paciencia(int atual, int maxima) {
 }
 
 /* Imprime Receita Alvo e Lanche na Bandeja lado a lado, alinhados pela base */
-static void imprimir_comparacao_lanche(const Pedido *pedido, const PilhaBurger *lanche) {
+void imprimir_comparacao_lanche(const Pedido *pedido, const PilhaBurger *lanche) {
     IdIngrediente vet_receita[MAX_CAMADAS_VISUAIS];
     IdIngrediente vet_bandeja[MAX_CAMADAS_VISUAIS];
     int qtd_receita = 0;
@@ -223,7 +223,7 @@ void renderizar_tela_jogo(
 
     printf(" ESTOQUE DA COZINHA:\n");
     if (estoque != NULL) {
-        printf("  Pao ilimitado | Mostarda ilimitado | Ketchup ilimitado | Picles ilimitado | Alface ilimitado |\n| Queijo Cheddar (%d) | Queijo suico (%d) | Tomate (%d) | Cebola (%d) |\n| Carne (%d) | Ovo Frito (%d) | Bacon (%d) |",
+        printf("  Pao ilimitado | Mostarda ilimitado | Ketchup ilimitado | Picles ilimitado | Alface ilimitado |\n| Queijo Cheddar (%d) | Queijo suico (%d) | Tomate (%d) | Cebola (%d) |\n| Carne (%d) | Ovo Frito (%d) | Bacon (%d) |\n",
                estoque->perenes[PERENE_QUEIJO_CHEDDAR],
                estoque->perenes[PERENE_QUEIJO_SUICO],
                estoque->perenes[PERENE_TOMATE], 
