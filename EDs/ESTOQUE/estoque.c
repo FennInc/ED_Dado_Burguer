@@ -20,6 +20,10 @@ int estoqueEhPerecivel(char ing) {
     return ing == 'n' || ing == 'o' || ing == 'b';
 }
 
+int estoqueEhIlimitado(char ing) {
+    return ing == 'z' || ing == 'm' || ing == 'k' || ing == 'p' || ing == 'a';
+}
+
 //verifica qual dos ingredientes são dos perenes
 int estoqueIndicePerene(char ing) {
     switch (ing) {
@@ -41,6 +45,11 @@ const char *estoqueNomeIngrediente(char ing) {
     case 'q': return "queijo cheddar";
     case 'c': return "cebola";
     case 't': return "tomate";
+    case 'z': return "pao";
+    case 'k': return "ketchup";
+    case 'm': return "mostarda";
+    case 'p': return "picles";
+    case 'a': return "alface";
     default:  return "?";
     }
 }
@@ -93,6 +102,13 @@ int estoquePreparar(Estoque *est, char ing, int turnoAtual, int *outVencimento) 
         return 1;
     }
 
+    if(estoqueEhIlimitado(ing)){
+        if (outVencimento != NULL) {
+            *outVencimento = -1;
+        }
+        return -1;
+    }
+
     int idx = estoqueIndicePerene(ing);
     if (idx >= 0) {
         est->perenes[idx]++;
@@ -101,7 +117,6 @@ int estoquePreparar(Estoque *est, char ing, int turnoAtual, int *outVencimento) 
         }
         return 1;
     }
-
     return -1;
 }
 
@@ -121,6 +136,13 @@ int estoqueConsumir(Estoque *est, char ing, int *outVencimento) {
         return 1;
     }
 
+    if(estoqueEhIlimitado(ing)){
+        if (outVencimento != NULL) {
+            *outVencimento = -1;
+        }
+        return 1;
+    }
+
     int idx = estoqueIndicePerene(ing);
     if (idx >= 0) {
         if (est->perenes[idx] <= 0) {
@@ -131,8 +153,8 @@ int estoqueConsumir(Estoque *est, char ing, int *outVencimento) {
             *outVencimento = -1;
         }
         return 1;
-    }
 
+    }
     return -1;
 }
 
@@ -158,11 +180,14 @@ int estoqueQuantidade(const Estoque *est, char ing) {
         return (h != NULL) ? h->tam : -1;
     }
 
-    int idx = estoqueIndicePerene(ing);
-    if (idx >= 0) {
-        return est->perenes[idx];
+    if(estoqueEhIlimitado(ing)){
+        return -1;
     }
 
+        int idx = estoqueIndicePerene(ing);
+        if (idx >= 0) {
+            return est->perenes[idx];
+        }
     return -1;
 }
 

@@ -17,7 +17,7 @@ typedef struct {
     FilaPrioridade carne;
     FilaPrioridade ovo;
     FilaPrioridade bacon;
-    int perenes[PERENE_QTD]; /* s, q, c, t */
+    int perenes[PERENE_QTD]; // s, q, c, t
 } Estoque;
 
 void estoqueInicializar(Estoque *est);
@@ -35,5 +35,6 @@ int estoquePreparar(Estoque *est, char ing, int turnoAtual, int *outVencimento);
 int estoqueConsumir(Estoque *est, char ing, int *outVencimento);
 int estoqueInserirVencimento(Estoque *est, char ing, int vencimento);
 int estoqueQuantidade(const Estoque *est, char ing);
+int estoqueEhIlimitado(char ing);
 
 #endif

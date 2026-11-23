@@ -80,3 +80,9 @@ bool validar_hamburguer(const PilhaBurger *pilha, const Pedido *pedido) {
     NoIngrediente *cursor_receita = pedido->receita_inicio;
     return comparar_recursivo(pilha->topo, &cursor_receita) && (cursor_receita == NULL);
 }
+
+
+//Limpa a pilha do lanche e monta a lista encadeada da receita atual.
+//Empilha um ingrediente no lanche (LIFO) e retorna 1 se deu certo ou 0 se bloqueado/falhou.
+//Desempilha o topo do lanche (LIFO), devolve o simbolo em outSimbolo e retorna 1 se removeu ou 0 se vazio.
+// Compara a pilha montada com a receita do pedido e retorna 1 se estiver igual ou 0 se errado.

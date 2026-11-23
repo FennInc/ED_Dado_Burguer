@@ -7,11 +7,11 @@
 typedef struct{
     int cod;
     char receita[8];
-}Pedido; //transformei o produto na formatação de pedido
+}PedidoAVL; //transformei o produto na formatação de PedidoAVL
 
 typedef struct str_NodoAvl NodoAvl;
 struct str_NodoAvl { //da dando erro de compilação mas n acho que é nada
-    Pedido  dado;
+    PedidoAVL  dado;
     NodoAvl *esq;
     NodoAvl *dir;
     int      altura;   /* folha = 0; NULL = -1 (por convenção) */
@@ -32,7 +32,7 @@ NodoAvl* avlRotEsq(NodoAvl *x);
 NodoAvl* avlReequilibrar(NodoAvl *raiz);
 
 NodoAvl* avlBuscar(NodoAvl *raiz, int cod);
-NodoAvl* avlInserir(NodoAvl *raiz, Pedido valor);
+NodoAvl* avlInserir(NodoAvl *raiz, PedidoAVL valor);
 
 NodoAvl* avlMinimo(NodoAvl *raiz);
 NodoAvl* avlMaximo(NodoAvl *raiz);

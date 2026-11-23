@@ -1,3 +1,4 @@
 *.exe
 *.log
+*.o
 TXTs/pedidos.txt

@@ -6,7 +6,6 @@
 #define TAM 20
 /* IDs padronizados dos ingredientes */
 typedef enum {
-    ing_pao_inferior=1,  // i
     ing_mostarda,        // m
     ing_carne,           // n
     ing_queijo_cheddar,  // q

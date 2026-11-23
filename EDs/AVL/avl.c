@@ -96,8 +96,8 @@ NodoAvl* avlBuscar(NodoAvl *raiz, int cod) {
 
 /* Inserção: descida igual à Abp; na subida, reequilibra cada ancestral.
    No máximo uma rotação por inserção.
-   Uso: raiz = avlInserir(raiz, Pedido); */
-NodoAvl* avlInserir(NodoAvl *raiz, Pedido valor) {
+   Uso: raiz = avlInserir(raiz, PedidoAVL); */
+NodoAvl* avlInserir(NodoAvl *raiz, PedidoAVL valor) {
     if (raiz == NULL) {
         NodoAvl *novo = (NodoAvl*) malloc(sizeof(NodoAvl));
         novo->dado   = valor;

@@ -95,7 +95,6 @@ void limpar_tela(void) {
    const char *nome_ingrediente(IdIngrediente id)
 {
     switch (id) {
-        case ing_pao_inferior:   return "Pao Inferior";
         case ing_ketchup:        return "Ketchup";
         case ing_mostarda:       return "Mostarda";
         case ing_carne:          return "Carne";
@@ -256,3 +255,6 @@ void renderizar_tela_jogo(
     printf("   [4] Entregar pedido ao cliente\n");
     printf("   [0] Abandonar partida\n");
 }
+
+//Copia os dados do estoque atual para o snapshot visual EstoqueVisual.
+//Imprime o HUD da partida no terminal com pedido, lanche, estoque, fila e turnos/paciencia.
