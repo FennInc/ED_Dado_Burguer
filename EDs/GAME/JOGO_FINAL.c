@@ -22,7 +22,7 @@
 
 #define ARQUIVO_LOG "medicoes.log"
 
-//relatorio
+//relatorio de desempenho
 static void emitirRelatorioDesempenho(TabelaEnc *cache) {
     double mediaComparacoes = (g_buscas == 0) ? 0.0 : (double)g_comparacoes / g_buscas;
     double taxa = (g_hits + g_miss == 0) ? 0.0 : (double)g_hits / (g_hits + g_miss) * 100.0;
@@ -34,19 +34,20 @@ static void emitirRelatorioDesempenho(TabelaEnc *cache) {
     relatorioFim();
 }
 
-static void executar_partida(NodoAvl *raiz,
-                             TabelaEnc *cache,
-                             int menorCod,
-                             int maiorCod,
-                             ListaHistorico *hist,
-                             const char *caminhoHist,
-                             unsigned int semente) {
+//limpar caractere da entrada
+static void limparEntrada(void) {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF) {
+    }
+}
+
+static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int maiorCod, ListaHistorico *hist, const char *caminhoHist, unsigned int semente) {
     if (raiz == NULL || menorCod > maiorCod) {
         printf("Nao ha pedidos carregados para iniciar a partida.\n");
         return;
-    } //verifica pedidos
+    }  //verifica pedidos
 
-    int numClientes = sortearIntervalo(CFG_CLIENTES_MIN, CFG_CLIENTES_MAX); //sorteia quantidade de clientes
+    int numClientes = sortearIntervalo(CFG_CLIENTES_MIN, CFG_CLIENTES_MAX);
     relatorioParametros(semente, numClientes);
 
     Partida partida;
@@ -68,15 +69,14 @@ static void executar_partida(NodoAvl *raiz,
     int codPedido = 0;
     char receitaAtual[CFG_RECEITA_TAM];
 
-    if (!pedidosObterReceita(raiz, cache, menorCod, maiorCod,
-                             receitaAtual, &codPedido)) {
+    if (!pedidosObterReceita(raiz, cache, menorCod, maiorCod, receitaAtual, &codPedido)) {
         printf("Falha ao sortear o pedido do primeiro cliente.\n");
         return;
     }
 
     Pedido pedidoVis = {0};
     pedidoVis.codigo = codPedido;
-    snprintf(pedidoVis.nome_lanche, sizeof(pedidoVis.nome_lanche),"Receita: %s", receitaAtual);
+    snprintf(pedidoVis.nome_lanche, sizeof(pedidoVis.nome_lanche), "Receita: %s", receitaAtual);
 
     PilhaBurger lanche = {0};
     b1_inicializar_montagem_e_receita(&lanche, &pedidoVis, receitaAtual);
@@ -93,19 +93,18 @@ static void executar_partida(NodoAvl *raiz,
         b1_renderizar_partida(&partida, &fila, &pedidoVis, &lanche, &estVis,
                               pacienciaAtual, codPedido, receitaAtual);
 
-        int acao = ler_opcao_inteira("\nEscolha uma acao: ", 0, 4);
+        //Acoes: 0 = abandonar, 1 = preparar, 2 = adicionar, 3 = remover
+        int acao = ler_opcao_inteira("\nEscolha uma acao: ", 0, 3);
 
-        switch(acao){ //quitar
-        case 0 :
+        if (acao == 0) {
             partidaAbandonar(&partida);
-            break;
 
-        case 1: //preparar ingrediente
+        } else if (acao == 1) {
+           //preparacao
             char ing = '\0';
             printf("Preparar ingrediente (n=carne, o=ovo, b=bacon, s=queijo suico, q=cheddar, c=cebola, t=tomate): ");
             if (scanf(" %c", &ing) == 1) {
-                int ch;
-                while ((ch = getchar()) != '\n' && ch != EOF);
+                limparEntrada();
 
                 int venc = -1;
                 int res = estoquePreparar(&partida.estoque, ing, partida.turno, &venc);
@@ -118,57 +117,52 @@ static void executar_partida(NodoAvl *raiz,
                     turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
                 } else if (res == 0) {
                     printf("Estoque cheio para %s.\n", estoqueNomeIngrediente(ing));
+                } else if (estoqueEhIlimitado(ing)) {
+                    printf("%s nao precisa de preparo.\n", estoqueNomeIngrediente(ing));
                 } else {
-                    if(estoqueEhIlimitado(ing)) printf("%s não precisa de preparo\n", estoqueNomeIngrediente(ing));
-                    else printf("Ingrediente invalido.\n");
+                    printf("Ingrediente invalido.\n");
                 }
             }
-        break;
-        
-        case 2: //adicionar ao lanche
-            ing = '\0';
-            printf("Adicionar ingrediente (n, o, b, s, q, c, t): ");
+
+        } else if (acao == 2) {
+            //Adicionar um ingrediente ao lanche. Os ilimitados (z, k, m, p, a) passam pelo estoque como os demais: consumir sempre funciona.
+            char ing = '\0';
+            printf("Adicionar ingrediente (n=carne, o=ovo, b=bacon, s=queijo suico, q=cheddar, c=cebola, t=tomate, z=pao de cima, k=ketchup, m=mostarda, p=picles, a=alface): ");
             if (scanf(" %c", &ing) == 1) {
-                if(estoqueEhIlimitado(ing)){
-                    if (b1_adicionar_na_pilha(&lanche, ing)) {
-                        printf("Adicionou %s ao lanche.\n", estoqueNomeIngrediente(ing));
-                        turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
-                    break;
-                }
-                int ch;
-                while ((ch = getchar()) != '\n' && ch != EOF);
+                limparEntrada();
 
                 int vencConsumido = -1;
                 int ok = estoqueConsumir(&partida.estoque, ing, &vencConsumido);
                 if (ok == 1) {
                     if (b1_adicionar_na_pilha(&lanche, ing)) {
                         printf("Adicionou %s ao lanche.\n", estoqueNomeIngrediente(ing));
-                            // se a receita terminou
-                           if (b1_validar_lanche(&lanche, &pedidoVis, receitaAtual)) {
-                                printf("Pedido entregue com sucesso!\n");
 
-                                Cliente atendido;
-                                desenfileira_Clientes(&fila, &atendido);
-                                turnosAcaoRealizada(&partida, &pacienciaAtual, 1);
+                        if (ing == 'z' && b1_validar_lanche(&lanche, &pedidoVis, receitaAtual)) {
+                            //pedido concluido
+                            printf("Pedido concluido com sucesso!\n");
 
-                                if (!partidaTerminou(&partida)) {
-                                    pacienciaAtual = CFG_PACIENCIA_MAX;
-                                    if (!pedidosObterReceita(raiz, cache, menorCod, maiorCod,
-                                                            receitaAtual, &codPedido)) {
-                                        receitaAtual[0] = '\0';
-                                    }
-                                    pedidoVis.codigo = codPedido;
-                                    snprintf(pedidoVis.nome_lanche, sizeof(pedidoVis.nome_lanche),"Receita: %s", receitaAtual);
-                                    b1_inicializar_montagem_e_receita(&lanche, &pedidoVis, receitaAtual);
-                                } else {
+                            Cliente atendido;
+                            desenfileira_Clientes(&fila, &atendido);
+                            turnosAcaoRealizada(&partida, &pacienciaAtual, 1);
+
+                            if (!partidaTerminou(&partida)) {
+                                pacienciaAtual = CFG_PACIENCIA_MAX;
+                                if (!pedidosObterReceita(raiz, cache, menorCod, maiorCod, receitaAtual, &codPedido)) {
                                     receitaAtual[0] = '\0';
                                 }
-                            } else if (ing == 'z'){
-                                printf("Lanche incorreto! Turno gasto.\n");
-                                turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
-                                break;
+                                pedidoVis.codigo = codPedido;
+                                snprintf(pedidoVis.nome_lanche, sizeof(pedidoVis.nome_lanche),
+                                         "Receita: %s", receitaAtual);
+                                b1_inicializar_montagem_e_receita(&lanche, &pedidoVis, receitaAtual);
+                            } else {
+                                receitaAtual[0] = '\0';
                             }
-                        turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
+                        } else if (ing == 'z') {
+                            printf("Lanche incorreto! Turno gasto.\n");
+                            turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
+                        } else {
+                            turnosAcaoRealizada(&partida, &pacienciaAtual, 0);
+                        }
                     }
                 } else if (ok == 0) {
                     printf("Sem estoque de %s.\n", estoqueNomeIngrediente(ing));
@@ -176,9 +170,8 @@ static void executar_partida(NodoAvl *raiz,
                     printf("Ingrediente invalido.\n");
                 }
             }
-        break;
 
-        case 3: //remover do lanche
+        } else if (acao == 3) {
             char rem = '\0';
             if (b1_remover_do_topo(&lanche, &rem)) {
                 printf("Removeu %s do topo.\n", estoqueNomeIngrediente(rem));
@@ -186,22 +179,19 @@ static void executar_partida(NodoAvl *raiz,
             } else {
                 printf("Lanche ja esta vazio.\n");
             }
-        break;
         }
     }
 
     printf("\n=== FIM DA PARTIDA ===\n");
-    printf("Atendidos: %d/%d | Turnos: %d | Pontuacao: %d\n",
-           partida.clientesAtendidos,
-           partida.clientesTotal,
-           partida.turno,
-           partidaPontuacao(&partida));
+    printf("Atendidos: %d/%d | Turnos: %d | Pontuacao: %d\n", partida.clientesAtendidos, partida.clientesTotal, partida.turno, partidaPontuacao(&partida));
 
     b1_registrar_e_salvar_historico(hist, caminhoHist, &partida);
 
     Cliente remCli;
     while (desenfileira_Clientes(&fila, &remCli)) {
     }
+
+    //Relatorio de desempenho ao encerrar a partida antes de voltar ao menu.
     emitirRelatorioDesempenho(cache);
 }
 
@@ -261,7 +251,6 @@ int main(int argc, char *argv[]) {
         maiorCod = avlMaximo(raiz)->dado.cod;
     }
 
-    // TODO [Bloco 1 - Colega]: carregar historico inicial em lista
     ListaHistorico historico;
     inicializar_historico(&historico, 16);
     carregar_historico(&historico, argv[2]);
@@ -291,8 +280,7 @@ int main(int argc, char *argv[]) {
         char resp = '\0';
         printf("\nVoltar ao menu? (s/n): ");
         if (scanf(" %c", &resp) == 1) {
-            int ch;
-            while ((ch = getchar()) != '\n' && ch != EOF);
+            limparEntrada();
             if (tolower((unsigned char)resp) == 'n') {
                 rodando = 0;
             }
