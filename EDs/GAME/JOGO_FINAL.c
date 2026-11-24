@@ -22,6 +22,9 @@
 
 #define ARQUIVO_LOG "medicoes.log"
 
+static char ler_ingrediente(const char *prompt);
+static void ler_nome_jogador(char *destino, size_t tamanho);
+
 //relatorio de desempenho
 static void emitirRelatorioDesempenho(TabelaEnc *cache) {
     double mediaComparacoes = (g_buscas == 0) ? 0.0 : (double)g_comparacoes / g_buscas;
@@ -38,6 +41,43 @@ static void emitirRelatorioDesempenho(TabelaEnc *cache) {
 static void limparEntrada(void) {
     int ch;
     while ((ch = getchar()) != '\n' && ch != EOF) {
+    }
+}
+
+static void limparPedido(Pedido *pedido) {
+    if (pedido == NULL) return;
+    NoIngrediente *atual = pedido->receita_inicio;
+    while (atual != NULL) {
+        NoIngrediente *prox = atual->prox;
+        free(atual);
+        atual = prox;
+    }
+    pedido->receita_inicio = NULL;
+    pedido->qtd_ingredientes = 0;
+}
+
+static void configurarPedido(Pedido *pedido, int codigo, const char *receita) {
+    if (pedido == NULL) return;
+
+    limparPedido(pedido);
+    pedido->codigo = codigo;
+    snprintf(pedido->nome_lanche, sizeof(pedido->nome_lanche),
+             "Receita: %s", receita != NULL ? receita : "");
+
+    NoIngrediente **fim = &pedido->receita_inicio;
+    if (receita == NULL) return;
+
+    for (const char *p = receita; *p != '\0'; p++) {
+        int id = converteIngId(*p);
+        if (id < 0) continue;
+
+        NoIngrediente *novo = malloc(sizeof(NoIngrediente));
+        if (novo == NULL) return;
+        novo->id = (IdIngrediente)id;
+        novo->prox = NULL;
+        *fim = novo;
+        fim = &novo->prox;
+        pedido->qtd_ingredientes++;
     }
 }
 
@@ -74,10 +114,9 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
     }
 
     Pedido pedidoVis = {0};
-    pedidoVis.codigo = codPedido;
-    snprintf(pedidoVis.nome_lanche, sizeof(pedidoVis.nome_lanche), "Receita: %s", receitaAtual);
+    configurarPedido(&pedidoVis, codPedido, receitaAtual);
 
-    PilhaBurger lanche = {0};
+    PilhaBurger lanche = {0 };
     inicializaPilha(&lanche);
 
     while (!partidaTerminou(&partida)) {
@@ -96,10 +135,8 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
 
         } else if (acao == 1) {
            //preparacao
-            char ing = '\0';
-            printf("Preparar ingrediente (n=carne, o=ovo, b=bacon, s=queijo suico, q=cheddar, c=cebola, t=tomate): ");
-            if (scanf(" %c", &ing) == 1) {
-                limparEntrada();
+            char ing = ler_ingrediente("Preparar ingrediente (n=carne, o=ovo, b=bacon, s=queijo suico, q=cheddar, c=cebola, t=tomate): ");
+            if (ing != '\0') {
 
                 int venc = -1;
                 int res = estoquePreparar(&partida.estoque, ing, partida.turno, &venc);
@@ -120,36 +157,28 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
             }
 
         } else if (acao == 2) {
-            //Adicionar um ingrediente ao lanche. Os ilimitados (z, k, m, p, a) passam pelo estoque como os demais: consumir sempre funciona.
-            char ing = '\0';
-            printf("Adicionar ingrediente (n=carne, o=ovo, b=bacon, s=queijo suico, q=cheddar, c=cebola, t=tomate, z=pao de cima, k=ketchup, m=mostarda, p=picles, a=alface): ");
-            if (scanf(" %c", &ing) == 1) {
-                limparEntrada();
+            char ing = ler_ingrediente("Adicionar ingrediente (n=carne, o=ovo, b=bacon, s=queijo suico, q=cheddar, c=cebola, t=tomate, z=pao de cima, k=ketchup, m=mostarda, p=picles, a=alface): ");
+            if (ing != '\0') {
                 int vencConsumido = -1;
                 int ok = estoqueConsumir(&partida.estoque, ing, &vencConsumido);
                 if (ok == 1) {
-                    if (empilha_ingrediente(&lanche, converteIngId(ing)) < 0) {
-                        printf("Não pode adicionar ingrediente encima do pão!!!!!!\n");
-                    } 
-                    else if (empilha_ingrediente(&lanche, converteIngId(ing))){
+                    int empilhado = empilha_ingrediente(&lanche, (IdIngrediente)converteIngId(ing));
+                    if (empilhado < 0) {
+                        printf("Não pode adicionar ingrediente encima do pão!\n");
+                    } else if (empilhado == 1) {
                         printf("Adicionou %s ao lanche.\n", estoqueNomeIngrediente(ing));
                         if (ing == 'z' && validar_hamburguer(&lanche, &pedidoVis)) {
-                            //pedido concluido
                             printf("Pedido concluido com sucesso!\n");
-
                             Cliente atendido;
-                            desenfileira_FilaClientes(&fila, &atendido);
                             turnosAcaoRealizada(&partida, &fila.frente->dados.paciencia_atual, 1);
+                            desenfileira_FilaClientes(&fila, &atendido);
 
-                            //PARTIDA N ACABOU
                             if (!partidaTerminou(&partida)) {
                                 if (!pedidosObterReceita(raiz, cache, menorCod, maiorCod, receitaAtual, &codPedido)) {
                                     receitaAtual[0] = '\0';
                                 }
-                                pedidoVis.codigo = codPedido;
-                                snprintf(pedidoVis.nome_lanche, sizeof(pedidoVis.nome_lanche),
-                                         "Receita: %s", receitaAtual);
-                                          inicializaPilha(&lanche);
+                                configurarPedido(&pedidoVis, codPedido, receitaAtual);
+                                inicializaPilha(&lanche);
                             } else {
                                 receitaAtual[0] = '\0';
                             }
@@ -159,6 +188,8 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
                         } else {
                             turnosAcaoRealizada(&partida, &fila.frente->dados.paciencia_atual, 0);
                         }
+                    } else {
+                        printf("Nao foi possivel adicionar o ingrediente ao lanche.\n");
                     }
                 } else if (ok == 0) {
                     printf("Sem estoque de %s.\n", estoqueNomeIngrediente(ing));
@@ -168,18 +199,42 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
             }
 
         } else if (acao == 3) {
-            char rem = '\0';
-            if (desempilha_ingrediente(&lanche)) {
-                printf("Removeu %s do topo.\n", estoqueNomeIngrediente(rem));
+            IdIngrediente rem;
+            if (topo(&lanche, &rem) && desempilha_ingrediente(&lanche)) {
+                printf("Removeu %s do topo.\n", nome_ingrediente(rem));
                 turnosAcaoRealizada(&partida, &fila.frente->dados.paciencia_atual, 0);
             } else {
                 printf("Lanche ja esta vazio.\n");
             }
         }
+
+        if (!partidaTerminou(&partida)) {
+            renderizar_tela_jogo(partida.turno, partida.clientesAtendidos,
+                                 partida.clientesTotal - partida.clientesAtendidos,
+                                 cliente_atual(&fila), &pedidoVis, &lanche,
+                                 &partida.estoque);
+        }
     }
 
     printf("\n=== FIM DA PARTIDA ===\n");
     printf("Atendidos: %d/%d | Turnos: %d | Pontuacao: %d\n", partida.clientesAtendidos, partida.clientesTotal, partida.turno, partidaPontuacao(&partida));
+
+    char nome[MAX_NOME];
+    ler_nome_jogador(nome, sizeof(nome));
+
+    RegistroHistorico registro = {0};
+    snprintf(registro.nome_jogador, sizeof(registro.nome_jogador), "%s", nome);
+    registro.pontuacao = partidaPontuacao(&partida);
+    registro.clientes_atendidos = partida.clientesAtendidos;
+    registro.turnos_jogados = partida.turno > 1 ? partida.turno - 1 : 0;
+
+    if (!inserir_historico(hist, registro)) {
+        printf("Erro: nao foi possivel inserir o registro no historico.\n");
+    } else if (!salvar_historico(hist, caminhoHist)) {
+        printf("Erro: nao foi possivel salvar o historico em '%s'.\n", caminhoHist);
+    } else {
+        printf("Partida salva no historico de pontuacoes!\n");
+    }
 
     salvar_historico(hist, caminhoHist);
 
@@ -189,6 +244,46 @@ static void executar_partida(NodoAvl *raiz, TabelaEnc *cache, int menorCod, int 
 
     //Relatorio de desempenho ao encerrar a partida antes de voltar ao menu.
     emitirRelatorioDesempenho(cache);
+}
+
+static int ingredienteValido(char ing) {
+    return ing == 'n' || ing == 'o' || ing == 'b' || ing == 's' ||
+           ing == 'q' || ing == 'c' || ing == 't' || ing == 'z' ||
+           ing == 'k' || ing == 'm' || ing == 'p' || ing == 'a';
+}
+
+static char ler_ingrediente(const char *prompt) {
+    char linha[64];
+    printf("%s", prompt);
+    if (fgets(linha, sizeof(linha), stdin) == NULL) return '\0';
+
+    for (char *p = linha; *p != '\0'; p++) {
+        if (*p == ' ' || *p == '\t' || *p == '\n' || *p == '\r') continue;
+        char ing = (char)tolower((unsigned char)*p);
+        return ingredienteValido(ing) ? ing : ing;
+    }
+    return '\0';
+}
+
+static void ler_nome_jogador(char *destino, size_t tamanho) {
+    if (destino == NULL || tamanho == 0) return;
+
+    printf("Digite seu nome: ");
+    if (fgets(destino, (int)tamanho, stdin) == NULL) {
+        snprintf(destino, tamanho, "Jogador");
+        return;
+    }
+
+    size_t fim = strcspn(destino, "\r\n");
+    destino[fim] = '\0';
+
+    for (char *p = destino; *p != '\0'; p++) {
+        if (*p == ';') *p = ' ';
+    }
+
+    if (destino[0] == '\0') {
+        snprintf(destino, tamanho, "Jogador");
+    }
 }
 
 int main(int argc, char *argv[]) {

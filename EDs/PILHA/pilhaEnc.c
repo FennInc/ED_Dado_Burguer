@@ -12,14 +12,18 @@ int estaVaziaPilha(PilhaBurger *p) {
 }
 
 int empilha_ingrediente(PilhaBurger *p, IdIngrediente id) {
+    if (p == NULL || id < ing_mostarda || id >= TOTAL_INGREDIENTES)
+        return 0;
+
+    if (p->topo != NULL && p->topo->id == ing_pao_superior) {
+        printf("Nao eh possivel adicionar ingrediente acima do pao superior.\n");
+        return -1;
+    }
+
     NoIngrediente *novo = (NoIngrediente*) malloc(sizeof(NoIngrediente));
     if (novo == NULL)
         return 0;
-    if (p->topo->id == ing_pao_superior){
-        printf("nao eh possivel adicionar ingrediente no lanche fechado.");
-        return -1;
-    }
-    
+
     novo->id = id;
     novo->prox = p->topo; // aponta para o antigo topo
     p->topo = novo;        // o novo nodo passa a ser o topo

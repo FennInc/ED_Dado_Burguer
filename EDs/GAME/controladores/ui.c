@@ -236,10 +236,9 @@ void renderizar_tela_jogo(
 
     printf("========================================================================\n");
     printf(" ACOES (Custo: 1 turno):\n");
-    printf("   [1] Preparar perecivel (Carne/Bacon/Ovo)\n");
+    printf("   [1] Preparar perecivel (Carne/Bacon/Ovo) ou um ingrediente perene (Queijo Cheddar/Queijo suico/Tomate/Cebola)\n");
     printf("   [2] Adicionar ingrediente ao lanche\n");
     printf("   [3] Remover ingrediente do topo (Descartar)\n");
-    printf("   [4] Entregar pedido ao cliente\n");
     printf("   [0] Abandonar partida\n");
 }
 
