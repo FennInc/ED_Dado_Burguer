@@ -4,7 +4,7 @@ CFLAGS := -std=c11 -Wall -Wextra -g
 SOURCES := $(shell find EDs -type f -name '*.c' -print)
 INCLUDES := $(shell find EDs -type d -print | sed 's/^/-I/')
 TARGET := dado_burger
-PEDIDOS := TXTs/pedidos_teste.txt
+PEDIDOS := TXTs/pedidos.txt
 HISTORICO := TXTs/historico.txt
 
 .PHONY: all game-build game-run clean run-game
